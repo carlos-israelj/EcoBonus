@@ -15,7 +15,7 @@ fn test_mint_certificate() {
     let admin = Address::generate(&env);
     let owner = Address::generate(&env);
 
-    let contract_id = env.register_contract(None, CertificateNFT);
+    let contract_id = env.register(CertificateNFT, ());
     let client = CertificateNFTClient::new(&env, &contract_id);
 
     client.initialize(&admin);
@@ -55,7 +55,7 @@ fn test_transfer() {
     let owner1 = Address::generate(&env);
     let owner2 = Address::generate(&env);
 
-    let contract_id = env.register_contract(None, CertificateNFT);
+    let contract_id = env.register(CertificateNFT, ());
     let client = CertificateNFTClient::new(&env, &contract_id);
 
     client.initialize(&admin);
@@ -97,11 +97,11 @@ fn test_list_and_buy() {
     let buyer = Address::generate(&env);
 
     // Create mock token for payment
-    let token_address = env.register_stellar_asset_contract(admin.clone());
-    let token_client = token::Client::new(&env, &token_address);
-    token_client.mint(&buyer, &1_000_000);
+    let token_admin_client = token::StellarAssetClient::new(&env, &admin);
+    let token_address = env.register_stellar_asset_contract_v2(admin.clone()).address();
+    token_admin_client.mint(&buyer, &1_000_000);
 
-    let contract_id = env.register_contract(None, CertificateNFT);
+    let contract_id = env.register(CertificateNFT, ());
     let client = CertificateNFTClient::new(&env, &contract_id);
 
     client.initialize(&admin);
@@ -148,7 +148,7 @@ fn test_burn() {
     let admin = Address::generate(&env);
     let owner = Address::generate(&env);
 
-    let contract_id = env.register_contract(None, CertificateNFT);
+    let contract_id = env.register(CertificateNFT, ());
     let client = CertificateNFTClient::new(&env, &contract_id);
 
     client.initialize(&admin);
@@ -186,7 +186,7 @@ fn test_user_impact() {
     let admin = Address::generate(&env);
     let owner = Address::generate(&env);
 
-    let contract_id = env.register_contract(None, CertificateNFT);
+    let contract_id = env.register(CertificateNFT, ());
     let client = CertificateNFTClient::new(&env, &contract_id);
 
     client.initialize(&admin);
