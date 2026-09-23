@@ -31,7 +31,12 @@ if (typeof window !== "undefined") {
 }
 
 
-
+export const networks = {
+  testnet: {
+    networkPassphrase: "Test SDF Network ; September 2015",
+    contractId: "CCSIBFDFBOY5SXUAUB4DRJUH7DS34QVWLESMQGAZOVU33YZYKLD2M5NG",
+  }
+} as const
 
 export const Errors = {
   1: {message:"PoolNotFound"},
@@ -76,7 +81,6 @@ export interface RewardPool {
   available_balance: i128;
   is_active: boolean;
   sponsor: string;
-  token_address: string;
   total_distributed: i128;
   total_funded: i128;
 }
@@ -106,7 +110,7 @@ export interface Client {
 
   /**
    * Construct and simulate a fund_pool transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
-   * Fund an existing pool
+   * Fund an existing pool with XLM
    */
   fund_pool: ({sponsor, amount}: {sponsor: string, amount: i128}, options?: MethodOptions) => Promise<AssembledTransaction<Result<void>>>
 
@@ -124,9 +128,9 @@ export interface Client {
 
   /**
    * Construct and simulate a create_pool transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
-   * Create a new reward pool
+   * Create a new reward pool with native XLM
    */
-  create_pool: ({sponsor, token_address, initial_amount}: {sponsor: string, token_address: string, initial_amount: i128}, options?: MethodOptions) => Promise<AssembledTransaction<Result<void>>>
+  create_pool: ({sponsor, initial_amount}: {sponsor: string, initial_amount: i128}, options?: MethodOptions) => Promise<AssembledTransaction<Result<void>>>
 
   /**
    * Construct and simulate a is_validator transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
@@ -148,7 +152,7 @@ export interface Client {
 
   /**
    * Construct and simulate a withdraw_pool transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
-   * Withdraw funds from pool (sponsor only)
+   * Withdraw XLM from pool (sponsor only)
    */
   withdraw_pool: ({sponsor, amount}: {sponsor: string, amount: i128}, options?: MethodOptions) => Promise<AssembledTransaction<Result<void>>>
 
@@ -178,7 +182,7 @@ export interface Client {
 
   /**
    * Construct and simulate a distribute_reward transaction. Returns an `AssembledTransaction` object which will have a `result` field containing the result of the simulation. If this transaction changes contract state, you will need to call `signAndSend()` on the returned object.
-   * Distribute reward after validation (automatic after approval)
+   * Distribute XLM reward after validation (automatic after approval)
    */
   distribute_reward: ({claim_id}: {claim_id: u64}, options?: MethodOptions) => Promise<AssembledTransaction<Result<void>>>
 
@@ -207,23 +211,23 @@ export class Client extends ContractClient {
   constructor(public readonly options: ContractClientOptions) {
     super(
       new ContractSpec([ "AAAAAAAAAA5HZXQgcG9vbCBzdGF0cwAAAAAACGdldF9wb29sAAAAAQAAAAAAAAAHc3BvbnNvcgAAAAATAAAAAQAAA+kAAAfQAAAAClJld2FyZFBvb2wAAAAAAAM=",
-        "AAAAAAAAABVGdW5kIGFuIGV4aXN0aW5nIHBvb2wAAAAAAAAJZnVuZF9wb29sAAAAAAAAAgAAAAAAAAAHc3BvbnNvcgAAAAATAAAAAAAAAAZhbW91bnQAAAAAAAsAAAABAAAD6QAAAAIAAAAD",
+        "AAAAAAAAAB5GdW5kIGFuIGV4aXN0aW5nIHBvb2wgd2l0aCBYTE0AAAAAAAlmdW5kX3Bvb2wAAAAAAAACAAAAAAAAAAdzcG9uc29yAAAAABMAAAAAAAAABmFtb3VudAAAAAAACwAAAAEAAAPpAAAAAgAAAAM=",
         "AAAAAAAAABFHZXQgY2xhaW0gZGV0YWlscwAAAAAAAAlnZXRfY2xhaW0AAAAAAAABAAAAAAAAAAhjbGFpbV9pZAAAAAYAAAABAAAD6QAAB9AAAAAFQ2xhaW0AAAAAAAAD",
         "AAAAAAAAABdJbml0aWFsaXplIHRoZSBjb250cmFjdAAAAAAKaW5pdGlhbGl6ZQAAAAAAAQAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAA==",
-        "AAAAAAAAABhDcmVhdGUgYSBuZXcgcmV3YXJkIHBvb2wAAAALY3JlYXRlX3Bvb2wAAAAAAwAAAAAAAAAHc3BvbnNvcgAAAAATAAAAAAAAAA10b2tlbl9hZGRyZXNzAAAAAAAAEwAAAAAAAAAOaW5pdGlhbF9hbW91bnQAAAAAAAsAAAABAAAD6QAAAAIAAAAD",
+        "AAAAAAAAAChDcmVhdGUgYSBuZXcgcmV3YXJkIHBvb2wgd2l0aCBuYXRpdmUgWExNAAAAC2NyZWF0ZV9wb29sAAAAAAIAAAAAAAAAB3Nwb25zb3IAAAAAEwAAAAAAAAAOaW5pdGlhbF9hbW91bnQAAAAAAAsAAAABAAAD6QAAAAIAAAAD",
         "AAAAAAAAAB9DaGVjayBpZiBhZGRyZXNzIGlzIGEgdmFsaWRhdG9yAAAAAAxpc192YWxpZGF0b3IAAAABAAAAAAAAAAdhZGRyZXNzAAAAABMAAAABAAAAAQ==",
         "AAAAAAAAAB1TdWJtaXQgYSBjbGFpbSBmb3IgdmFsaWRhdGlvbgAAAAAAAAxzdWJtaXRfY2xhaW0AAAAFAAAAAAAAAAptaXNzaW9uX2lkAAAAAAAGAAAAAAAAAAdjbGFpbWVyAAAAABMAAAAAAAAABmFtb3VudAAAAAAACwAAAAAAAAAJcHJvb2ZfdXJpAAAAAAAAEAAAAAAAAAAHc3BvbnNvcgAAAAATAAAAAQAAA+kAAAAGAAAAAw==",
         "AAAAAAAAABxBZGQgYSB2YWxpZGF0b3IgKGFkbWluIG9ubHkpAAAADWFkZF92YWxpZGF0b3IAAAAAAAACAAAAAAAAAAVhZG1pbgAAAAAAABMAAAAAAAAACXZhbGlkYXRvcgAAAAAAABMAAAABAAAD6QAAAAIAAAAD",
-        "AAAAAAAAACdXaXRoZHJhdyBmdW5kcyBmcm9tIHBvb2wgKHNwb25zb3Igb25seSkAAAAADXdpdGhkcmF3X3Bvb2wAAAAAAAACAAAAAAAAAAdzcG9uc29yAAAAABMAAAAAAAAABmFtb3VudAAAAAAACwAAAAEAAAPpAAAAAgAAAAM=",
+        "AAAAAAAAACVXaXRoZHJhdyBYTE0gZnJvbSBwb29sIChzcG9uc29yIG9ubHkpAAAAAAAADXdpdGhkcmF3X3Bvb2wAAAAAAAACAAAAAAAAAAdzcG9uc29yAAAAABMAAAAAAAAABmFtb3VudAAAAAAACwAAAAEAAAPpAAAAAgAAAAM=",
         "AAAAAAAAACpWYWxpZGF0ZSBhIGNsYWltICh2YWxpZGF0b3Igb3IgYWRtaW4gb25seSkAAAAAAA52YWxpZGF0ZV9jbGFpbQAAAAAAAwAAAAAAAAAIY2xhaW1faWQAAAAGAAAAAAAAAAl2YWxpZGF0b3IAAAAAAAATAAAAAAAAAAhhcHByb3ZlZAAAAAEAAAABAAAD6QAAAAIAAAAD",
         "AAAAAAAAACdEZWFjdGl2YXRlIHBvb2wgKHNwb25zb3Igb3IgYWRtaW4gb25seSkAAAAAD2RlYWN0aXZhdGVfcG9vbAAAAAACAAAAAAAAAAdzcG9uc29yAAAAABMAAAAAAAAABmNhbGxlcgAAAAAAEwAAAAEAAAPpAAAAAgAAAAM=",
         "AAAAAAAAABFHZXQgdXNlcidzIGNsYWltcwAAAAAAAA9nZXRfdXNlcl9jbGFpbXMAAAAAAQAAAAAAAAAEdXNlcgAAABMAAAABAAAD6gAAAAY=",
         "AAAAAAAAAB9SZW1vdmUgYSB2YWxpZGF0b3IgKGFkbWluIG9ubHkpAAAAABByZW1vdmVfdmFsaWRhdG9yAAAAAgAAAAAAAAAFYWRtaW4AAAAAAAATAAAAAAAAAAl2YWxpZGF0b3IAAAAAAAATAAAAAQAAA+kAAAACAAAAAw==",
-        "AAAAAAAAAD1EaXN0cmlidXRlIHJld2FyZCBhZnRlciB2YWxpZGF0aW9uIChhdXRvbWF0aWMgYWZ0ZXIgYXBwcm92YWwpAAAAAAAAEWRpc3RyaWJ1dGVfcmV3YXJkAAAAAAAAAQAAAAAAAAAIY2xhaW1faWQAAAAGAAAAAQAAA+kAAAACAAAAAw==",
+        "AAAAAAAAAEFEaXN0cmlidXRlIFhMTSByZXdhcmQgYWZ0ZXIgdmFsaWRhdGlvbiAoYXV0b21hdGljIGFmdGVyIGFwcHJvdmFsKQAAAAAAABFkaXN0cmlidXRlX3Jld2FyZAAAAAAAAAEAAAAAAAAACGNsYWltX2lkAAAABgAAAAEAAAPpAAAAAgAAAAM=",
         "AAAAAAAAABRHZXQgc3BvbnNvcidzIGNsYWltcwAAABJnZXRfc3BvbnNvcl9jbGFpbXMAAAAAAAEAAAAAAAAAB3Nwb25zb3IAAAAAEwAAAAEAAAPqAAAABg==",
         "AAAABAAAAAAAAAAAAAAABUVycm9yAAAAAAAAEAAAAAAAAAAMUG9vbE5vdEZvdW5kAAAAAQAAAAAAAAARUG9vbEFscmVhZHlFeGlzdHMAAAAAAAACAAAAAAAAAAxQb29sSW5hY3RpdmUAAAADAAAAAAAAABdJbnN1ZmZpY2llbnRQb29sQmFsYW5jZQAAAAAEAAAAAAAAAA1DbGFpbU5vdEZvdW5kAAAAAAAACgAAAAAAAAAVQ2xhaW1BbHJlYWR5UHJvY2Vzc2VkAAAAAAAACwAAAAAAAAAMQ2xhaW1FeHBpcmVkAAAADAAAAAAAAAAPSW52YWxpZFByb29mVXJpAAAAAA0AAAAAAAAADUludmFsaWRBbW91bnQAAAAAAAAUAAAAAAAAABBJbnZhbGlkVmFsaWRhdG9yAAAAFQAAAAAAAAAPQ2xhaW1Ob3RQZW5kaW5nAAAAABYAAAAAAAAADFVuYXV0aG9yaXplZAAAAB4AAAAAAAAACk5vdFNwb25zb3IAAAAAAB8AAAAAAAAADE5vdFZhbGlkYXRvcgAAACAAAAAAAAAAE1Rva2VuVHJhbnNmZXJGYWlsZWQAAAAAKAAAAAAAAAATSW52YWxpZFRva2VuQWRkcmVzcwAAAAAp",
         "AAAAAQAAABlDbGFpbSBzdWJtaXR0ZWQgYnkgYSB1c2VyAAAAAAAAAAAAAAVDbGFpbQAAAAAAAAkAAAAAAAAABmFtb3VudAAAAAAACwAAAAAAAAAHY2xhaW1lcgAAAAATAAAAAAAAAAJpZAAAAAAABgAAAAAAAAAKbWlzc2lvbl9pZAAAAAAABgAAAAAAAAAJcHJvb2ZfdXJpAAAAAAAAEAAAAAAAAAAGc3RhdHVzAAAAAAfQAAAAC0NsYWltU3RhdHVzAAAAAAAAAAAMc3VibWl0dGVkX2F0AAAABgAAAAAAAAAMdmFsaWRhdGVkX2F0AAAD6AAAAAYAAAAAAAAACXZhbGlkYXRvcgAAAAAAA+gAAAAT",
-        "AAAAAQAAACBSZXdhcmQgcG9vbCBtYW5hZ2VkIGJ5IGEgc3BvbnNvcgAAAAAAAAAKUmV3YXJkUG9vbAAAAAAABgAAAAAAAAARYXZhaWxhYmxlX2JhbGFuY2UAAAAAAAALAAAAAAAAAAlpc19hY3RpdmUAAAAAAAABAAAAAAAAAAdzcG9uc29yAAAAABMAAAAAAAAADXRva2VuX2FkZHJlc3MAAAAAAAATAAAAAAAAABF0b3RhbF9kaXN0cmlidXRlZAAAAAAAAAsAAAAAAAAADHRvdGFsX2Z1bmRlZAAAAAs=",
+        "AAAAAQAAACBSZXdhcmQgcG9vbCBtYW5hZ2VkIGJ5IGEgc3BvbnNvcgAAAAAAAAAKUmV3YXJkUG9vbAAAAAAABQAAAAAAAAARYXZhaWxhYmxlX2JhbGFuY2UAAAAAAAALAAAAAAAAAAlpc19hY3RpdmUAAAAAAAABAAAAAAAAAAdzcG9uc29yAAAAABMAAAAAAAAAEXRvdGFsX2Rpc3RyaWJ1dGVkAAAAAAAACwAAAAAAAAAMdG90YWxfZnVuZGVkAAAACw==",
         "AAAAAgAAABFTdGF0dXMgb2YgYSBjbGFpbQAAAAAAAAAAAAALQ2xhaW1TdGF0dXMAAAAABAAAAAAAAAAAAAAAB1BlbmRpbmcAAAAAAAAAAAAAAAAIQXBwcm92ZWQAAAAAAAAAAAAAAAhSZWplY3RlZAAAAAAAAAAAAAAACERpc3B1dGVk",
         "AAAAAQAAACBWYWxpZGF0aW9uIHJlc3VsdCBmcm9tIEFJIG9yYWNsZQAAAAAAAAAQVmFsaWRhdGlvblJlc3VsdAAAAAQAAAAAAAAACGNhdGVnb3J5AAAAEAAAAAAAAAAKY29uZmlkZW5jZQAAAAAABAAAAAAAAAATZXN0aW1hdGVkX3dlaWdodF9rZwAAAAAEAAAAAAAAAAV2YWxpZAAAAAAAAAE=" ]),
       options

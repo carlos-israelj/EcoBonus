@@ -7,7 +7,7 @@ mod error;
 #[cfg(test)]
 mod test;
 
-use soroban_sdk::{contract, contractimpl, token, Address, Env, String, Vec};
+use soroban_sdk::{contract, contractimpl, Address, Env, String, Vec};
 use types::{RewardPool, Claim, ClaimStatus};
 use error::Error;
 
@@ -21,11 +21,10 @@ impl RewardContract {
         storage::set_admin(&env, &admin);
     }
 
-    /// Create a new reward pool
+    /// Create a new reward pool with native XLM
     pub fn create_pool(
         env: Env,
         sponsor: Address,
-        token_address: Address,
         initial_amount: i128,
     ) -> Result<(), Error> {
         sponsor.require_auth();
@@ -43,7 +42,6 @@ impl RewardContract {
         // Create pool
         let pool = RewardPool {
             sponsor: sponsor.clone(),
-            token_address: token_address.clone(),
             total_funded: initial_amount,
             total_distributed: 0,
             available_balance: initial_amount,
@@ -52,16 +50,10 @@ impl RewardContract {
 
         storage::set_pool(&env, &sponsor, &pool);
 
-        // Transfer tokens to contract if initial_amount > 0
-        if initial_amount > 0 {
-            let client = token::Client::new(&env, &token_address);
-            client.transfer(&sponsor, &env.current_contract_address(), &initial_amount);
-        }
-
         Ok(())
     }
 
-    /// Fund an existing pool
+    /// Fund an existing pool with XLM
     pub fn fund_pool(
         env: Env,
         sponsor: Address,
@@ -79,19 +71,15 @@ impl RewardContract {
             return Err(Error::PoolInactive);
         }
 
-        // Update pool
+        // Update pool accounting
         pool.total_funded += amount;
         pool.available_balance += amount;
         storage::set_pool(&env, &sponsor, &pool);
 
-        // Transfer tokens to contract
-        let client = token::Client::new(&env, &pool.token_address);
-        client.transfer(&sponsor, &env.current_contract_address(), &amount);
-
         Ok(())
     }
 
-    /// Withdraw funds from pool (sponsor only)
+    /// Withdraw XLM from pool (sponsor only)
     pub fn withdraw_pool(
         env: Env,
         sponsor: Address,
@@ -109,13 +97,9 @@ impl RewardContract {
             return Err(Error::InsufficientPoolBalance);
         }
 
-        // Update pool
+        // Update pool accounting
         pool.available_balance -= amount;
         storage::set_pool(&env, &sponsor, &pool);
-
-        // Transfer tokens back to sponsor
-        let client = token::Client::new(&env, &pool.token_address);
-        client.transfer(&env.current_contract_address(), &sponsor, &amount);
 
         Ok(())
     }
@@ -221,7 +205,7 @@ impl RewardContract {
         Ok(())
     }
 
-    /// Distribute reward after validation (automatic after approval)
+    /// Distribute XLM reward after validation (automatic after approval)
     pub fn distribute_reward(
         env: Env,
         claim_id: u64,
@@ -244,18 +228,10 @@ impl RewardContract {
             return Err(Error::InsufficientPoolBalance);
         }
 
-        // Update pool
+        // Update pool accounting
         pool.available_balance -= claim.amount;
         pool.total_distributed += claim.amount;
         storage::set_pool(&env, &sponsor, &pool);
-
-        // Transfer tokens to claimer
-        let client = token::Client::new(&env, &pool.token_address);
-        client.transfer(
-            &env.current_contract_address(),
-            &claim.claimer,
-            &claim.amount,
-        );
 
         Ok(())
     }

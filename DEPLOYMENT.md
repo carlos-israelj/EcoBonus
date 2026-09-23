@@ -16,13 +16,14 @@
 - **Explorer**: https://stellar.expert/explorer/testnet/contract/CAIFF4NMRTSM3C25NXBX35EULVWTHKLEIC5C2GHC35IJBFQC5JZIR47V
 - **Stellar Lab**: https://lab.stellar.org/r/testnet/contract/CAIFF4NMRTSM3C25NXBX35EULVWTHKLEIC5C2GHC35IJBFQC5JZIR47V
 
-### RewardContract
-- **Contract ID**: `CAQK5BHS42OCAV6JLUE3ABNALB3OWWI664BOQWYSQEVBLKWULF7RQ5JT`
-- **WASM Hash**: `12c10caedb39b3fce7f40f573f2cc092a2278bd9e7707d2d161b9c7cd052ce39`
-- **Deploy TX**: [94336b81...](https://stellar.expert/explorer/testnet/tx/94336b814fe7cca813edb5f5c4050fc0cdc87881c791b7c644b72e67ca8b4f53)
-- **Init TX**: [9097c5e5...](https://stellar.expert/explorer/testnet/tx/9097c5e51b92cce032e4646d7816ca216378ce8b153a5347a4abb4c2cbc3cee6)
-- **Explorer**: https://stellar.expert/explorer/testnet/contract/CAQK5BHS42OCAV6JLUE3ABNALB3OWWI664BOQWYSQEVBLKWULF7RQ5JT
-- **Stellar Lab**: https://lab.stellar.org/r/testnet/contract/CAQK5BHS42OCAV6JLUE3ABNALB3OWWI664BOQWYSQEVBLKWULF7RQ5JT
+### RewardContract (XLM Native)
+- **Contract ID**: `CCSIBFDFBOY5SXUAUB4DRJUH7DS34QVWLESMQGAZOVU33YZYKLD2M5NG`
+- **WASM Hash**: `93284c30a4c0967d6c7f086f1fdb639996c26c34e6e193f3db2a6cb88298a390`
+- **Deploy TX**: [0dec6830...](https://stellar.expert/explorer/testnet/tx/0dec6830a9e3720282c24005dc46109f15e153001d7b75b652a221b5b5bfdd61)
+- **Init TX**: [461444f4...](https://stellar.expert/explorer/testnet/tx/461444f4245d5dcdb0043bfdb68b49abdaaaf2fbbfaae6d3cb64492168332da4)
+- **Explorer**: https://stellar.expert/explorer/testnet/contract/CCSIBFDFBOY5SXUAUB4DRJUH7DS34QVWLESMQGAZOVU33YZYKLD2M5NG
+- **Stellar Lab**: https://lab.stellar.org/r/testnet/contract/CCSIBFDFBOY5SXUAUB4DRJUH7DS34QVWLESMQGAZOVU33YZYKLD2M5NG
+- **Nota**: Usa XLM nativo en lugar de USDC (más simple para MVP)
 
 ### CertificateNFT
 - **Contract ID**: `CCM2NUS74BODRZNCVPVRCXML4M6P4FXR2BUW726Z6URQZDFX7UN7B5LS`

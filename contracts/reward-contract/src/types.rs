@@ -5,10 +5,9 @@ use soroban_sdk::{contracttype, Address, String};
 #[derive(Clone, Debug)]
 pub struct RewardPool {
     pub sponsor: Address,
-    pub token_address: Address,  // USDC token contract
-    pub total_funded: i128,
-    pub total_distributed: i128,
-    pub available_balance: i128,
+    pub total_funded: i128,      // Total XLM funded
+    pub total_distributed: i128,  // Total XLM distributed
+    pub available_balance: i128,  // Available XLM balance
     pub is_active: bool,
 }
 
