@@ -154,6 +154,7 @@ impl RewardContract {
             id: claim_id,
             mission_id,
             claimer: claimer.clone(),
+            sponsor: sponsor.clone(),
             amount,
             status: ClaimStatus::Pending,
             submitted_at: env.ledger().timestamp(),
@@ -298,13 +299,6 @@ impl RewardContract {
     // Helper function to find which sponsor a claim belongs to
     fn find_claim_sponsor(env: &Env, claim_id: u64) -> Result<Address, Error> {
         let claim = storage::get_claim(env, claim_id)?;
-
-        // In a real implementation, we'd store the sponsor in the claim
-        // For now, iterate through all possible sponsors (not efficient)
-        // This is a limitation we'd fix in production
-
-        // Placeholder: return the claimer as sponsor (needs to be fixed)
-        // TODO: Add sponsor field to Claim struct
-        Ok(claim.claimer)
+        Ok(claim.sponsor)
     }
 }

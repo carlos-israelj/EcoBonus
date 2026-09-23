@@ -28,6 +28,7 @@ pub struct Claim {
     pub id: u64,
     pub mission_id: u64,
     pub claimer: Address,
+    pub sponsor: Address,          // Pool sponsor for this claim
     pub amount: i128,
     pub status: ClaimStatus,
     pub submitted_at: u64,
