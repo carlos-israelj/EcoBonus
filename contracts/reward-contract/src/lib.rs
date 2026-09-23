@@ -3,7 +3,6 @@
 mod types;
 mod storage;
 mod error;
-mod token;
 
 #[cfg(test)]
 mod test;

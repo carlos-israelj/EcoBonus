@@ -32,7 +32,7 @@ impl MissionContract {
         max_claimers: u32,
         deadline: u64,
         metadata_uri: String,
-        evidence_required: u8,
+        evidence_required: u32,
     ) -> Result<u64, Error> {
         creator.require_auth();
 
@@ -238,21 +238,29 @@ impl MissionContract {
     }
 }
 
-// Helper function to calculate distance (simplified Haversine formula)
+// Helper function to calculate distance using integer math
 fn calculate_distance(lat1: i64, lon1: i64, lat2: i64, lon2: i64) -> u32 {
-    // Convert from fixed point (scaled by 1e6)
-    let lat1_f = lat1 as f64 / 1_000_000.0;
-    let lon1_f = lon1 as f64 / 1_000_000.0;
-    let lat2_f = lat2 as f64 / 1_000_000.0;
-    let lon2_f = lon2 as f64 / 1_000_000.0;
+    // Calculate absolute differences (already scaled by 1e6)
+    let dlat = if lat2 > lat1 { lat2 - lat1 } else { lat1 - lat2 };
+    let dlon = if lon2 > lon1 { lon2 - lon1 } else { lon1 - lon2 };
 
-    // Simplified distance calculation (for demo purposes)
-    // In production, use proper Haversine formula
-    let dlat = (lat2_f - lat1_f).abs();
-    let dlon = (lon2_f - lon1_f).abs();
+    // Integer square root approximation using Newton's method
+    // Calculate dlat^2 + dlon^2
+    let sum_squares = (dlat * dlat + dlon * dlon) as u128;
 
-    // Rough approximation: 1 degree ≈ 111 km
-    let distance_km = ((dlat * dlat + dlon * dlon).sqrt() * 111.0) as u32;
+    // Integer square root
+    let mut x = sum_squares;
+    let mut y = (x + 1) / 2;
+    while y < x {
+        x = y;
+        y = (x + sum_squares / x) / 2;
+    }
+    let distance_scaled = x as u64;
 
-    distance_km
+    // Convert to meters: 1 degree ≈ 111,000 meters
+    // distance_scaled is in units of 1e-6 degrees
+    // So multiply by 111 and divide by 1000 to get meters
+    let distance_meters = (distance_scaled * 111 / 1000) as u32;
+
+    distance_meters
 }

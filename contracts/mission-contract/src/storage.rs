@@ -14,7 +14,7 @@ const USER_MISSIONS_PREFIX: &str = "user_missions";
 pub fn get_admin(env: &Env) -> Address {
     env.storage()
         .instance()
-        .get(&symbol_short!(ADMIN_KEY))
+        .get(&symbol_short!("admin"))
         .unwrap()
 }
 
@@ -22,12 +22,12 @@ pub fn get_admin(env: &Env) -> Address {
 pub fn set_admin(env: &Env, admin: &Address) {
     env.storage()
         .instance()
-        .set(&symbol_short!(ADMIN_KEY), admin);
+        .set(&symbol_short!("admin"), admin);
 }
 
 /// Get next mission ID and increment counter
 pub fn next_mission_id(env: &Env) -> u64 {
-    let key = symbol_short!(MISSION_COUNTER_KEY);
+    let key = symbol_short!("mis_cnt");
     let current: u64 = env.storage().instance().get(&key).unwrap_or(0);
     env.storage().instance().set(&key, &(current + 1));
     current + 1
@@ -35,13 +35,13 @@ pub fn next_mission_id(env: &Env) -> u64 {
 
 /// Get mission count
 pub fn get_mission_count(env: &Env) -> u64 {
-    let key = symbol_short!(MISSION_COUNTER_KEY);
+    let key = symbol_short!("mis_cnt");
     env.storage().instance().get(&key).unwrap_or(0)
 }
 
 /// Get mission by ID
 pub fn get_mission(env: &Env, mission_id: u64) -> Result<Mission, Error> {
-    let key = (symbol_short!(MISSION_PREFIX), mission_id);
+    let key = (symbol_short!("mission"), mission_id);
     env.storage()
         .persistent()
         .get(&key)
@@ -50,7 +50,7 @@ pub fn get_mission(env: &Env, mission_id: u64) -> Result<Mission, Error> {
 
 /// Set mission
 pub fn set_mission(env: &Env, mission_id: u64, mission: &Mission) {
-    let key = (symbol_short!(MISSION_PREFIX), mission_id);
+    let key = (symbol_short!("mission"), mission_id);
     env.storage().persistent().set(&key, mission);
 }
 
@@ -71,19 +71,19 @@ pub fn get_all_missions(env: &Env) -> Vec<Mission> {
 
 /// Check if user has claimed a mission
 pub fn has_user_claimed(env: &Env, user: &Address, mission_id: u64) -> bool {
-    let key = (symbol_short!(USER_CLAIMS_PREFIX), user.clone(), mission_id);
+    let key = (symbol_short!("usr_clms"), user.clone(), mission_id);
     env.storage().persistent().has(&key)
 }
 
 /// Mark user as having claimed a mission
 pub fn mark_user_claimed(env: &Env, user: &Address, mission_id: u64) {
-    let key = (symbol_short!(USER_CLAIMS_PREFIX), user.clone(), mission_id);
+    let key = (symbol_short!("usr_clms"), user.clone(), mission_id);
     env.storage().persistent().set(&key, &true);
 }
 
 /// Add mission to creator's list
 pub fn add_creator_mission(env: &Env, creator: &Address, mission_id: u64) {
-    let key = (symbol_short!(CREATOR_MISSIONS_PREFIX), creator.clone());
+    let key = (symbol_short!("crt_miss"), creator.clone());
     let mut missions: Vec<u64> = env.storage().persistent().get(&key).unwrap_or(Vec::new(env));
     missions.push_back(mission_id);
     env.storage().persistent().set(&key, &missions);
@@ -91,7 +91,7 @@ pub fn add_creator_mission(env: &Env, creator: &Address, mission_id: u64) {
 
 /// Get missions created by an address
 pub fn get_creator_missions(env: &Env, creator: &Address) -> Vec<u64> {
-    let key = (symbol_short!(CREATOR_MISSIONS_PREFIX), creator.clone());
+    let key = (symbol_short!("crt_miss"), creator.clone());
     env.storage()
         .persistent()
         .get(&key)
@@ -100,7 +100,7 @@ pub fn get_creator_missions(env: &Env, creator: &Address) -> Vec<u64> {
 
 /// Add mission to user's claimed list
 pub fn add_user_mission(env: &Env, user: &Address, mission_id: u64) {
-    let key = (symbol_short!(USER_MISSIONS_PREFIX), user.clone());
+    let key = (symbol_short!("usr_miss"), user.clone());
     let mut missions: Vec<u64> = env.storage().persistent().get(&key).unwrap_or(Vec::new(env));
     missions.push_back(mission_id);
     env.storage().persistent().set(&key, &missions);
@@ -108,7 +108,7 @@ pub fn add_user_mission(env: &Env, user: &Address, mission_id: u64) {
 
 /// Get missions claimed by a user
 pub fn get_user_missions(env: &Env, user: &Address) -> Vec<u64> {
-    let key = (symbol_short!(USER_MISSIONS_PREFIX), user.clone());
+    let key = (symbol_short!("usr_miss"), user.clone());
     env.storage()
         .persistent()
         .get(&key)

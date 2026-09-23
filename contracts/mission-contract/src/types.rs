@@ -31,7 +31,7 @@ pub struct Mission {
     pub status: MissionStatus,
     pub max_claimers: u32,        // Maximum number of people who can claim
     pub current_claimers: u32,    // Current number of claims
-    pub evidence_required: u8,    // Number of photos required
+    pub evidence_required: u32,   // Number of photos required
     pub deadline: u64,            // Unix timestamp
     pub metadata_uri: String,     // IPFS URI with description, images, etc.
     pub funded_amount: i128,      // Total amount funded

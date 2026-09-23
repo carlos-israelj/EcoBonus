@@ -15,7 +15,7 @@ const VALIDATORS_KEY: &str = "validators";
 pub fn get_admin(env: &Env) -> Address {
     env.storage()
         .instance()
-        .get(&symbol_short!(ADMIN_KEY))
+        .get(&symbol_short!("admin"))
         .unwrap()
 }
 
@@ -23,12 +23,12 @@ pub fn get_admin(env: &Env) -> Address {
 pub fn set_admin(env: &Env, admin: &Address) {
     env.storage()
         .instance()
-        .set(&symbol_short!(ADMIN_KEY), admin);
+        .set(&symbol_short!("admin"), admin);
 }
 
 /// Get next claim ID
 pub fn next_claim_id(env: &Env) -> u64 {
-    let key = symbol_short!(CLAIM_COUNTER_KEY);
+    let key = symbol_short!("clm_cnt");
     let current: u64 = env.storage().instance().get(&key).unwrap_or(0);
     env.storage().instance().set(&key, &(current + 1));
     current + 1
@@ -36,7 +36,7 @@ pub fn next_claim_id(env: &Env) -> u64 {
 
 /// Get reward pool by sponsor
 pub fn get_pool(env: &Env, sponsor: &Address) -> Result<RewardPool, Error> {
-    let key = (symbol_short!(POOL_PREFIX), sponsor.clone());
+    let key = (symbol_short!("pool"), sponsor.clone());
     env.storage()
         .persistent()
         .get(&key)
@@ -45,19 +45,19 @@ pub fn get_pool(env: &Env, sponsor: &Address) -> Result<RewardPool, Error> {
 
 /// Set reward pool
 pub fn set_pool(env: &Env, sponsor: &Address, pool: &RewardPool) {
-    let key = (symbol_short!(POOL_PREFIX), sponsor.clone());
+    let key = (symbol_short!("pool"), sponsor.clone());
     env.storage().persistent().set(&key, pool);
 }
 
 /// Check if pool exists
 pub fn has_pool(env: &Env, sponsor: &Address) -> bool {
-    let key = (symbol_short!(POOL_PREFIX), sponsor.clone());
+    let key = (symbol_short!("pool"), sponsor.clone());
     env.storage().persistent().has(&key)
 }
 
 /// Get claim by ID
 pub fn get_claim(env: &Env, claim_id: u64) -> Result<Claim, Error> {
-    let key = (symbol_short!(CLAIM_PREFIX), claim_id);
+    let key = (symbol_short!("claim"), claim_id);
     env.storage()
         .persistent()
         .get(&key)
@@ -66,13 +66,13 @@ pub fn get_claim(env: &Env, claim_id: u64) -> Result<Claim, Error> {
 
 /// Set claim
 pub fn set_claim(env: &Env, claim_id: u64, claim: &Claim) {
-    let key = (symbol_short!(CLAIM_PREFIX), claim_id);
+    let key = (symbol_short!("claim"), claim_id);
     env.storage().persistent().set(&key, claim);
 }
 
 /// Add claim to user's list
 pub fn add_user_claim(env: &Env, user: &Address, claim_id: u64) {
-    let key = (symbol_short!(USER_CLAIMS_PREFIX), user.clone());
+    let key = (symbol_short!("usr_clms"), user.clone());
     let mut claims: Vec<u64> = env.storage().persistent().get(&key).unwrap_or(Vec::new(env));
     claims.push_back(claim_id);
     env.storage().persistent().set(&key, &claims);
@@ -80,7 +80,7 @@ pub fn add_user_claim(env: &Env, user: &Address, claim_id: u64) {
 
 /// Get user's claims
 pub fn get_user_claims(env: &Env, user: &Address) -> Vec<u64> {
-    let key = (symbol_short!(USER_CLAIMS_PREFIX), user.clone());
+    let key = (symbol_short!("usr_clms"), user.clone());
     env.storage()
         .persistent()
         .get(&key)
@@ -89,7 +89,7 @@ pub fn get_user_claims(env: &Env, user: &Address) -> Vec<u64> {
 
 /// Add claim to sponsor's list
 pub fn add_sponsor_claim(env: &Env, sponsor: &Address, claim_id: u64) {
-    let key = (symbol_short!(SPONSOR_CLAIMS_PREFIX), sponsor.clone());
+    let key = (symbol_short!("spon_clm"), sponsor.clone());
     let mut claims: Vec<u64> = env.storage().persistent().get(&key).unwrap_or(Vec::new(env));
     claims.push_back(claim_id);
     env.storage().persistent().set(&key, &claims);
@@ -97,7 +97,7 @@ pub fn add_sponsor_claim(env: &Env, sponsor: &Address, claim_id: u64) {
 
 /// Get sponsor's funded claims
 pub fn get_sponsor_claims(env: &Env, sponsor: &Address) -> Vec<u64> {
-    let key = (symbol_short!(SPONSOR_CLAIMS_PREFIX), sponsor.clone());
+    let key = (symbol_short!("spon_clm"), sponsor.clone());
     env.storage()
         .persistent()
         .get(&key)
@@ -106,7 +106,7 @@ pub fn get_sponsor_claims(env: &Env, sponsor: &Address) -> Vec<u64> {
 
 /// Add validator
 pub fn add_validator(env: &Env, validator: &Address) {
-    let key = symbol_short!(VALIDATORS_KEY);
+    let key = symbol_short!("validat");
     let mut validators: Vec<Address> = env.storage().instance().get(&key).unwrap_or(Vec::new(env));
 
     // Check if already exists
@@ -122,7 +122,7 @@ pub fn add_validator(env: &Env, validator: &Address) {
 
 /// Check if address is validator
 pub fn is_validator(env: &Env, address: &Address) -> bool {
-    let key = symbol_short!(VALIDATORS_KEY);
+    let key = symbol_short!("validat");
     let validators: Vec<Address> = env.storage().instance().get(&key).unwrap_or(Vec::new(env));
 
     for v in validators.iter() {
@@ -136,7 +136,7 @@ pub fn is_validator(env: &Env, address: &Address) -> bool {
 
 /// Remove validator
 pub fn remove_validator(env: &Env, validator: &Address) {
-    let key = symbol_short!(VALIDATORS_KEY);
+    let key = symbol_short!("validat");
     let validators: Vec<Address> = env.storage().instance().get(&key).unwrap_or(Vec::new(env));
     let mut new_validators = Vec::new(env);
 

@@ -2,54 +2,44 @@ use soroban_sdk::{symbol_short, Address, Env, Vec};
 use crate::types::{ImpactCertificate, Listing};
 use crate::error::Error;
 
-// Storage keys
-const ADMIN_KEY: &str = "admin";
-const TOKEN_COUNTER_KEY: &str = "token_counter";
-const BURNED_COUNTER_KEY: &str = "burned_counter";
-const CERTIFICATE_PREFIX: &str = "cert";
-const OWNER_PREFIX: &str = "owner";
-const OWNER_TOKENS_PREFIX: &str = "owner_tokens";
-const LISTING_PREFIX: &str = "listing";
-const MINTERS_KEY: &str = "minters";
-
 pub fn get_admin(env: &Env) -> Address {
     env.storage()
         .instance()
-        .get(&symbol_short!(ADMIN_KEY))
+        .get(&symbol_short!("admin"))
         .unwrap()
 }
 
 pub fn set_admin(env: &Env, admin: &Address) {
     env.storage()
         .instance()
-        .set(&symbol_short!(ADMIN_KEY), admin);
+        .set(&symbol_short!("admin"), admin);
 }
 
 pub fn next_token_id(env: &Env) -> u64 {
-    let key = symbol_short!(TOKEN_COUNTER_KEY);
+    let key = symbol_short!("tkn_cnt");
     let current: u64 = env.storage().instance().get(&key).unwrap_or(0);
     env.storage().instance().set(&key, &(current + 1));
     current + 1
 }
 
 pub fn get_token_count(env: &Env) -> u64 {
-    let key = symbol_short!(TOKEN_COUNTER_KEY);
+    let key = symbol_short!("tkn_cnt");
     env.storage().instance().get(&key).unwrap_or(0)
 }
 
 pub fn get_burned_count(env: &Env) -> u64 {
-    let key = symbol_short!(BURNED_COUNTER_KEY);
+    let key = symbol_short!("burned");
     env.storage().instance().get(&key).unwrap_or(0)
 }
 
 pub fn increment_burned_count(env: &Env) {
-    let key = symbol_short!(BURNED_COUNTER_KEY);
+    let key = symbol_short!("burned");
     let current: u64 = env.storage().instance().get(&key).unwrap_or(0);
     env.storage().instance().set(&key, &(current + 1));
 }
 
 pub fn get_certificate(env: &Env, token_id: u64) -> Result<ImpactCertificate, Error> {
-    let key = (symbol_short!(CERTIFICATE_PREFIX), token_id);
+    let key = (symbol_short!("cert"), token_id);
     env.storage()
         .persistent()
         .get(&key)
@@ -57,17 +47,17 @@ pub fn get_certificate(env: &Env, token_id: u64) -> Result<ImpactCertificate, Er
 }
 
 pub fn set_certificate(env: &Env, token_id: u64, certificate: &ImpactCertificate) {
-    let key = (symbol_short!(CERTIFICATE_PREFIX), token_id);
+    let key = (symbol_short!("cert"), token_id);
     env.storage().persistent().set(&key, certificate);
 }
 
 pub fn remove_certificate(env: &Env, token_id: u64) {
-    let key = (symbol_short!(CERTIFICATE_PREFIX), token_id);
+    let key = (symbol_short!("cert"), token_id);
     env.storage().persistent().remove(&key);
 }
 
 pub fn get_owner(env: &Env, token_id: u64) -> Result<Address, Error> {
-    let key = (symbol_short!(OWNER_PREFIX), token_id);
+    let key = (symbol_short!("owner"), token_id);
     env.storage()
         .persistent()
         .get(&key)
@@ -75,19 +65,19 @@ pub fn get_owner(env: &Env, token_id: u64) -> Result<Address, Error> {
 }
 
 pub fn set_owner(env: &Env, token_id: u64, owner: &Address) {
-    let key = (symbol_short!(OWNER_PREFIX), token_id);
+    let key = (symbol_short!("owner"), token_id);
     env.storage().persistent().set(&key, owner);
 }
 
 pub fn add_owner_token(env: &Env, owner: &Address, token_id: u64) {
-    let key = (symbol_short!(OWNER_TOKENS_PREFIX), owner.clone());
+    let key = (symbol_short!("own_tkns"), owner.clone());
     let mut tokens: Vec<u64> = env.storage().persistent().get(&key).unwrap_or(Vec::new(env));
     tokens.push_back(token_id);
     env.storage().persistent().set(&key, &tokens);
 }
 
 pub fn remove_owner_token(env: &Env, owner: &Address, token_id: u64) {
-    let key = (symbol_short!(OWNER_TOKENS_PREFIX), owner.clone());
+    let key = (symbol_short!("own_tkns"), owner.clone());
     let tokens: Vec<u64> = env.storage().persistent().get(&key).unwrap_or(Vec::new(env));
     let mut new_tokens = Vec::new(env);
 
@@ -101,7 +91,7 @@ pub fn remove_owner_token(env: &Env, owner: &Address, token_id: u64) {
 }
 
 pub fn get_owner_tokens(env: &Env, owner: &Address) -> Vec<u64> {
-    let key = (symbol_short!(OWNER_TOKENS_PREFIX), owner.clone());
+    let key = (symbol_short!("own_tkns"), owner.clone());
     env.storage()
         .persistent()
         .get(&key)
@@ -109,7 +99,7 @@ pub fn get_owner_tokens(env: &Env, owner: &Address) -> Vec<u64> {
 }
 
 pub fn get_listing(env: &Env, token_id: u64) -> Result<Listing, Error> {
-    let key = (symbol_short!(LISTING_PREFIX), token_id);
+    let key = (symbol_short!("listing"), token_id);
     env.storage()
         .persistent()
         .get(&key)
@@ -117,13 +107,13 @@ pub fn get_listing(env: &Env, token_id: u64) -> Result<Listing, Error> {
 }
 
 pub fn set_listing(env: &Env, token_id: u64, listing: &Listing) {
-    let key = (symbol_short!(LISTING_PREFIX), token_id);
+    let key = (symbol_short!("listing"), token_id);
     env.storage().persistent().set(&key, listing);
 }
 
 pub fn has_listing(env: &Env, token_id: u64) -> bool {
-    let key = (symbol_short!(LISTING_PREFIX), token_id);
-    if let Ok(listing) = env.storage().persistent().get::<_, Listing>(&key) {
+    let key = (symbol_short!("listing"), token_id);
+    if let Some(listing) = env.storage().persistent().get::<_, Listing>(&key) {
         listing.is_active
     } else {
         false
@@ -131,7 +121,7 @@ pub fn has_listing(env: &Env, token_id: u64) -> bool {
 }
 
 pub fn add_minter(env: &Env, minter: &Address) {
-    let key = symbol_short!(MINTERS_KEY);
+    let key = symbol_short!("minters");
     let mut minters: Vec<Address> = env.storage().instance().get(&key).unwrap_or(Vec::new(env));
 
     for m in minters.iter() {
@@ -145,7 +135,7 @@ pub fn add_minter(env: &Env, minter: &Address) {
 }
 
 pub fn is_minter(env: &Env, address: &Address) -> bool {
-    let key = symbol_short!(MINTERS_KEY);
+    let key = symbol_short!("minters");
     let minters: Vec<Address> = env.storage().instance().get(&key).unwrap_or(Vec::new(env));
 
     for m in minters.iter() {
