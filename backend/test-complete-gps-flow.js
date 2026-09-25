@@ -51,7 +51,7 @@ async function test1_CheckFunction() {
     const { data, error } = await supabase.rpc('missions_nearby', {
       user_lat: -12.116373,
       user_lon: -77.031105,
-      radius_meters: 1000
+      search_radius_meters: 1000
     });
 
     if (error) {
@@ -143,7 +143,7 @@ async function test3_TestSupabaseRPC() {
       const { data: missions, error } = await supabase.rpc('missions_nearby', {
         user_lat: testUser.lat,
         user_lon: testUser.lon,
-        radius_meters: testUser.radius
+        search_radius_meters: testUser.radius
       });
 
       if (error) throw error;

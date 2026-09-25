@@ -41,7 +41,7 @@ class MissionController {
       const { data: missions, error } = await supabase.rpc('missions_nearby', {
         user_lat: latitude,
         user_lon: longitude,
-        radius_meters: radiusMeters
+        search_radius_meters: radiusMeters
       });
 
       if (error) {

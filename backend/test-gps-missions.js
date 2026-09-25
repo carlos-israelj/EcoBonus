@@ -84,7 +84,7 @@ async function testGPSMissions() {
     const { data: nearbyMissions, error: nearbyError } = await supabase.rpc('missions_nearby', {
       user_lat: userLat,
       user_lon: userLon,
-      radius_meters: radiusMeters
+      search_radius_meters: radiusMeters
     });
 
     if (nearbyError) {
@@ -111,7 +111,7 @@ async function testGPSMissions() {
     const { data: smallRadius } = await supabase.rpc('missions_nearby', {
       user_lat: userLat,
       user_lon: userLon,
-      radius_meters: 100
+      search_radius_meters: 100
     });
 
     console.log(`   ✅ Found ${smallRadius.length} missions within 100m (expected 0)\n`);
