@@ -101,13 +101,13 @@ export default function MapView({ spots, selected, onSelect, position, onPositio
   }, [walking])
   const locate = () => {
     if (tracking) { if (watch.current !== undefined) navigator.geolocation.clearWatch(watch.current); watch.current = undefined; setTracking(false); return }
-    if (!navigator.geolocation) { setError('Tu navegador no admite ubicación. Usa el recorrido demo.'); return }
+    if (!navigator.geolocation) { setLocationPrompt(true); setError('Tu navegador no admite ubicación. Usa el recorrido demo.'); return }
     setWalking(false); setTracking(true)
     watch.current = navigator.geolocation.watchPosition(result => {
       const coords: Coordinates = [result.coords.longitude, result.coords.latitude]
-      if (coords[0] < -81.5 || coords[0] > -68.5 || coords[1] < -18.5 || coords[1] > -0.5) { setError('Esta ubicación está fuera del piloto en Perú. Puedes explorar con el recorrido demo.'); if (watch.current !== undefined) navigator.geolocation.clearWatch(watch.current); watch.current = undefined; setTracking(false); return }
+      if (coords[0] < -81.5 || coords[0] > -68.5 || coords[1] < -18.5 || coords[1] > -0.5) { setLocationPrompt(true); setError('Esta ubicación está fuera del piloto en Perú. Puedes explorar con el recorrido demo.'); if (watch.current !== undefined) navigator.geolocation.clearWatch(watch.current); watch.current = undefined; setTracking(false); return }
       setError(''); onPositionRef.current(coords, 'gps')
-    }, failure => { setError(failure.code === 1 ? 'Ubicación no permitida. Actívala en tu navegador o usa el recorrido demo.' : 'No pudimos obtener tu ubicación. Inténtalo en un lugar abierto.'); if (watch.current !== undefined) navigator.geolocation.clearWatch(watch.current); watch.current = undefined; setTracking(false) }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 })
+    }, failure => { setLocationPrompt(true); setError(failure.code === 1 ? 'Ubicación no permitida. Actívala en tu navegador o usa el recorrido demo.' : 'No pudimos obtener tu ubicación. Inténtalo en un lugar abierto.'); if (watch.current !== undefined) navigator.geolocation.clearWatch(watch.current); watch.current = undefined; setTracking(false) }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 })
   }
   const activateLocation = () => { setLocationPrompt(false); locate() }
   return <div className="map-wrap"><div className="map-canvas" ref={container} aria-label="Mapa interactivo de misiones" />
@@ -116,7 +116,7 @@ export default function MapView({ spots, selected, onSelect, position, onPositio
     {routeStatus === 'loading' && <div className="map-route-status" role="status">Calculando ruta peatonal…</div>}
     {routeStatus === 'error' && <div className="map-route-status warning" role="status">No pudimos calcular la ruta peatonal. Revisa tu conexión.</div>}
     {locationPrompt && !tracking && <div className="map-location-prompt" role="dialog" aria-label="Activar ubicación"><span className="map-location-prompt-icon"><LocateFixed size={24} /></span><div><strong>Activa tu ubicación</strong><p>Encuentra misiones cerca de ti y sigue tu impacto en el mapa.</p></div><button className="button primary" onClick={activateLocation}>Activar ubicación</button></div>}
-    <div className="map-location"><span className="live-dot" /><b>{position[0] > -73 ? 'Arequipa, Perú' : 'Lima, Perú'}</b><span>Explora tu entorno</span></div>
+    <div className="map-location"><span className="live-dot" /><b>{position[0] > -73 ? 'Arequipa, Perú' : 'Lima, Perú'}</b><span>{tracking ? 'GPS activo' : 'Explora tu entorno'}</span></div>
     <div className="map-controls"><button aria-label="Acercar mapa" onClick={() => map.current?.zoomIn()}><Plus size={19} /></button><button aria-label="Alejar mapa" onClick={() => map.current?.zoomOut()}><Minus size={19} /></button><span /><button className={tilted ? 'active' : ''} aria-label="Alternar perspectiva del mapa" aria-pressed={tilted} onClick={() => { setTilted(!tilted); map.current?.easeTo({ pitch: tilted ? 0 : 48, bearing: tilted ? 0 : -15, duration: 900 }) }}><Layers size={19} /></button><button aria-label="Volver al norte" onClick={() => map.current?.resetNorthPitch()}><Navigation size={19} /></button></div>
     <button className={`map-locate ${tracking ? 'active' : ''}`} aria-label={tracking ? 'Detener seguimiento GPS' : 'Usar mi ubicación'} onClick={locate}>{tracking ? <><LocateFixed size={18} /><span>Desactivar</span></> : <Crosshair size={21} />}</button>
     <div className="map-legend"><span><i className="high" /> Alta</span><span><i className="medium" /> Media</span><span><i className="clean" /> Recuperada</span></div>

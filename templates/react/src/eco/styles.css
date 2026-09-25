@@ -137,4 +137,12 @@ html[data-theme='dark'] { --ink:#e6f7f1; --muted:#a3bbb4; --paper:#102b2d; --sur
 .map-location-prompt .button { grid-column:1 / -1; width:100%; padding:10px 14px; }
 .map-locate { width:auto; min-width:42px; padding:0 11px; gap:6px; border-radius:999px; }
 .map-locate span { font:700 .61rem 'Space Grotesk'; }
-@media (max-width: 500px) { .map-location-prompt { width:min(300px,calc(100% - 24px)); padding:14px; }.map-location-prompt p { font-size:.63rem; }.map-locate { min-width:42px; padding:0 10px; } }
+@media (max-width: 500px) { .map-location-prompt { width:min(300px,calc(100% - 24px)); padding:14px; }.map-location-prompt p { font-size:.63rem; }.map-locate { min-width:42px; padding:0 10px; } }.auth-methods { display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:4px; margin:18px 0 2px; border-radius:9px; background:#edf6f2; }
+.auth-methods button { display:flex; align-items:center; justify-content:center; gap:6px; min-height:35px; border-radius:6px; color:#71918a; background:transparent; font:600 .68rem 'Space Grotesk'; }
+.auth-methods button.active { color:#147f70; background:#fff; box-shadow:0 2px 7px rgba(20,70,60,.08); }
+.auth-quick-actions { margin-top:11px; }
+.auth-quick-actions .button { width:100%; }
+.detail-location { display:flex; align-items:center; gap:9px; margin:14px 0 2px; }
+.detail-location .button { flex:0 0 auto; }
+.detail-location span { color:#7a9690; font-size:.64rem; line-height:1.3; }
+@media (max-width: 500px) { .auth-methods { margin-top:14px; }.detail-location { align-items:flex-start; flex-direction:column; gap:6px; } }
