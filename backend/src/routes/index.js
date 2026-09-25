@@ -71,11 +71,11 @@ router.get('/health', (req, res) => {
   res.json({
     success: true,
     service: 'EcoBonus API',
-    version: '2.0.0',
+    version: '2.0.0-supabase',
     status: 'healthy',
     features: {
       auth: 'dual (Privy + Stellar)',
-      database: 'Supabase',
+      database: 'Supabase (rjeerpnshosuljapunyo)',
       points: 'enabled',
       vouchers: 'enabled',
       leaderboard: 'enabled',
