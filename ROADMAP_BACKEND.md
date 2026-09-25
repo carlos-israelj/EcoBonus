@@ -302,90 +302,171 @@ GET    /api/analytics/impact            # Tons removed, bags collected
 
 ## 📅 Implementación por Sprints
 
-### Sprint 0: Setup (Sep 24-30) 🔥 CURRENT
+### Sprint 0: Setup (Sep 24-30) ✅ **COMPLETADO**
 
-**Supabase Setup**:
-- [ ] Crear proyecto en Supabase
-- [ ] Run SQL schema (10 tablas)
-- [ ] Setup Storage buckets:
-  - `evidence-photos` (public)
-  - `mission-refs` (public)
-  - `sponsor-logos` (public)
-- [ ] Configure RLS policies
-- [ ] Get API keys
+**Decisión Arquitectónica**:
+- ✅ Sistema Híbrido: Privy + Supabase + Wallet Opcional
+- ❌ NO usar Magic.link (descartado)
 
-**Privy Integration**:
-- [ ] Install `@privy-io/server-auth`
-- [ ] Create middleware `authenticatePrivy()`
-- [ ] Endpoint `/api/auth/privy-verify`
-- [ ] User sync service (Privy → Supabase)
-- [ ] Update `.env`:
-  ```
-  PRIVY_APP_ID=cmug2qj1b01t90bjj0erfq3py
-  PRIVY_APP_SECRET=privy_app_secret_4xiVbRW2227viiWNPfv24B7R5JSBAcZZ68C6P5AVna24Ki48fcDQXmtP5dbrnD92aMsqWfxtkm9hsZDYt1PHkuRH
-  SUPABASE_URL=https://xxx.supabase.co
-  SUPABASE_SERVICE_ROLE_KEY=eyJxxx
-  ```
+**Supabase Setup**: ✅ COMPLETADO
+- [x] Crear proyecto en Supabase (`rjeerpnshosuljapunyo`)
+- [x] Run SQL schema (10 tablas)
+- [x] PostGIS extension habilitada
+- [x] Triggers creados (streaks, GPS distance, timestamps)
+- [x] Sample data insertado (admin user, 3 products)
+- [x] Conexión verificada con `test-supabase.js`
 
-**Points System**:
-- [ ] Service: `src/services/points.service.js`
-  - `awardPoints(userId, missionId, amount, reason)`
-  - `spendPoints(userId, amount, reason)`
-  - `getBalance(userId)`
-  - `getTransactions(userId, limit, offset)`
-  - `calculateLevel(xp)` - Formula: `floor(sqrt(xp/100)) + 1`
-- [ ] Controller: `src/controllers/points.controller.js`
-- [ ] Routes: `/api/points/*`
+**Privy Integration**: ✅ COMPLETADO
+- [x] Install `@privy-io/server-auth` + `ws`
+- [x] Middleware `dualAuth.js` (Privy + Stellar)
+- [x] Auto-creación de usuarios en primera sesión
+- [x] `.env` actualizado con credentials
 
-**Deliverables**:
-- Supabase configurado y accesible
-- Privy auth funcionando
-- Points API operativa
+**Points System**: ✅ COMPLETADO
+- [x] Service: `src/services/points.service.js`
+  - [x] `awardPoints()` con level calculation
+  - [x] `spendPoints()` con validación de balance
+  - [x] `getBalance()` con XP y level
+  - [x] `getHistory()` con paginación
+  - [x] Formula de niveles: `level = sqrt(experience/100) + 1`
+- [x] Controller: `src/controllers/points.controller.js`
+- [x] Routes: `/api/points/balance`, `/api/points/history`, `/api/points/admin/adjust`
+
+**Validator Dashboard**: ✅ COMPLETADO
+- [x] Service: `src/controllers/validator.controller.js`
+- [x] Endpoints: `/api/validator/queue`, `/api/validator/approve/:id`, `/api/validator/reject/:id`
+
+**Leaderboard**: ✅ COMPLETADO
+- [x] Service: `src/services/leaderboard.service.js`
+- [x] Tabla `leaderboard_cache` con TTL de 5 min
+- [x] Endpoints: `/api/leaderboard`, `/api/leaderboard/my-rank`, `/api/leaderboard/surrounding`
+
+**Voucher System**: ✅ COMPLETADO
+- [x] Service: `src/services/voucher.service.js`
+- [x] QR code generation (UUID)
+- [x] Endpoints: `/api/vouchers/catalog`, `/api/vouchers/redeem`, `/api/vouchers/verify/:qrCode`
+
+**Deliverables**: ✅ 100% COMPLETADO
+- ✅ Supabase configurado y accesible
+- ✅ Privy auth + Stellar wallet opcional
+- ✅ Points API operativa
+- ✅ Vouchers funcionando
+- ✅ Leaderboard con caché
+- ✅ Validator dashboard
 
 ---
 
-### Sprint 1: Missions & Map (Oct 1-7)
+### Sprint 1: Missions & Map (Oct 8-14) 🔥 **SPRINT ACTUAL**
 
-**Geo-Search**:
-- [ ] Service: `src/services/missions.service.js`
-  - `getNearbyMissions(lat, lng, radiusKm)`
+**Prioridad**: ALTA (Core Feature bloqueando frontend)
+
+**SQL Function (PostGIS)**:
+- [ ] Agregar a `supabase-schema.sql`:
+```sql
+CREATE OR REPLACE FUNCTION missions_nearby(
+  user_lat FLOAT,
+  user_lon FLOAT,
+  radius_meters INT DEFAULT 5000
+)
+RETURNS TABLE (
+  id UUID,
+  title TEXT,
+  points_reward INTEGER,
+  distance_meters INTEGER
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    m.id,
+    m.title,
+    m.points_reward,
+    ST_Distance(
+      ST_MakePoint(user_lon, user_lat)::geography,
+      ST_MakePoint(m.longitude, m.latitude)::geography
+    )::INTEGER as distance_meters
+  FROM missions m
+  WHERE m.status = 'active'
+    AND ST_DWithin(
+      ST_MakePoint(m.longitude, m.latitude)::geography,
+      ST_MakePoint(user_lon, user_lat)::geography,
+      radius_meters
+    )
+  ORDER BY distance_meters ASC;
+END;
+$$ LANGUAGE plpgsql;
+```
+
+**Backend Service**:
+- [ ] Implementar en `src/controllers/mission.controller.js`:
+  - `getNearbyMissions(req, res)` - llama a `missions_nearby()`
+  - `getMissionById(req, res)` - retorna detalle completo
   - `generateMissionCode(zoneType, sequence)` → LM-RIM-0412
-  - `createMission(data)`
-  - `updateMissionSeverity(id, severity)`
 
 **API Endpoints**:
-- [ ] `GET /api/missions/nearby?lat=-12.118893&lng=-77.029572&radius=5`
+- [ ] `GET /api/missions/nearby?lat=-12.118893&lng=-77.029572&radius=5000`
 - [ ] `GET /api/missions/:id`
-- [ ] `POST /api/missions` (admin/validator)
+- [ ] `POST /api/missions` (admin/validator only)
 
 **Deliverables**:
-- Missions API completa
-- Geo-search funcionando
+- SQL function desplegada en Supabase
+- Missions API con geo-search
+- Testing con coordenadas de Lima/CDMX
 
 ---
 
-### Sprint 2: Claims (2 Photos) (Oct 8-14)
+### Sprint 2: Before/After Photos + EXIF GPS (Oct 15-21)
 
-**Photo Upload**:
-- [ ] Service: `src/services/storage.service.js`
-  - `uploadPhoto(file, userId, type)` → Supabase Storage
-  - `generateSHA256(file)`
-  - `generatePerceptualHash(file)` - usando `imagehash` library
+**Prioridad**: ALTA (Core Feature)
 
-**Claims Submission**:
-- [ ] Service: `src/services/claims.service.js`
-  - `submitClaim(userId, missionId, beforePhoto, afterPhoto, gps, bags)`
-  - `validateGPSProximity(claimGPS, missionGPS, maxDistanceMeters)`
-  - `checkDuplicatePhoto(perceptualHash)`
+**Dependencies**:
+- [ ] `npm install exif-parser sharp`
+
+**Photo Validation Utility**:
+- [ ] Crear `src/utils/photoValidator.js`:
+```javascript
+import ExifParser from 'exif-parser';
+
+export async function validatePhotoGPS(photoBuffer, expectedLat, expectedLon, maxDistance = 100) {
+  const parser = ExifParser.create(photoBuffer);
+  const result = parser.parse();
+
+  const photoLat = result.tags.GPSLatitude;
+  const photoLon = result.tags.GPSLongitude;
+  const timestamp = result.tags.DateTimeOriginal;
+
+  const distance = calculateDistance(photoLat, photoLon, expectedLat, expectedLon);
+
+  if (distance > maxDistance) {
+    throw new Error(`Photo taken ${distance}m away from mission`);
+  }
+
+  return { lat: photoLat, lon: photoLon, timestamp };
+}
+
+export function validatePhotoSequence(beforeTimestamp, afterTimestamp) {
+  if (new Date(afterTimestamp) <= new Date(beforeTimestamp)) {
+    throw new Error('After photo must be taken AFTER before photo');
+  }
+}
+```
+
+**Claims Service**:
+- [ ] Update `src/services/claims.service.js`:
+  - `validateBeforeAfterPhotos(beforeBuffer, afterBuffer, missionGPS)`
+  - `generatePerceptualHash(photoBuffer)` - usando `sharp`
+  - `checkDuplicatePhoto(pHash)` - query Supabase
 
 **API Endpoints**:
-- [ ] `POST /api/claims` (multipart/form-data)
-  - Body: `{ missionId, beforePhoto (file), afterPhoto (file), gps: {lat, lng}, bagsCollected }`
+- [ ] Update `POST /api/claims`:
+  - Validar EXIF GPS de ambas fotos
+  - Validar timestamps (before < after)
+  - Validar distancia a misión (max 100m)
+  - Generar pHash anti-duplicados
 
 **Deliverables**:
-- Upload de 2 fotos funcionando
-- GPS validation activa
-- Duplicate detection
+- Validación dual de fotos con GPS
+- Detección de duplicados
+- Rechazo automático si GPS inválido
 
 ---
 

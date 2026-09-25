@@ -510,20 +510,39 @@ templates/react/src/
 
 ## 🚧 Bloqueadores y Dependencias
 
-### Dependencias Backend
-- ✅ API `/api/missions/nearby` debe estar lista antes de Sprint 1
-- ✅ API `/api/claims` debe estar lista antes de Sprint 3
-- ✅ Privy authentication middleware debe estar activo desde Sprint 0
+### ✅ Dependencias Backend LISTAS
+- [x] **Privy authentication middleware** - Activo en backend
+- [x] **Points System API** - `/api/points/*` funcionando
+- [x] **Voucher System API** - `/api/vouchers/*` completo
+- [x] **Leaderboard API** - `/api/leaderboard` con caché
+- [x] **Validator Dashboard API** - `/api/validator/*` operativo
+- [x] **Supabase Database** - 10 tablas desplegadas
 
-### Dependencias de Diseño
-- ⚠️ Mockup de 5 pantallas está disponible
-- ❌ Falta design system completo (spacing, shadows, etc.)
-- ❌ Falta flujo de admin dashboard (si frontend team lo hace)
+### ❌ Dependencias Backend PENDIENTES
+- [ ] **GPS Missions API** - `/api/missions/nearby` (Sprint 1 actual)
+- [ ] **Claims API with dual photos** - `/api/claims` con validación GPS (Sprint 2)
+- [ ] **IPFS Metadata** - Upload de fotos a IPFS (Sprint 3)
+
+### 🔔 IMPORTANTE para Frontend Team
+**Backend ya tiene completo**:
+1. Login con Privy (social + embedded wallets)
+2. Sistema de puntos (balance, historial, niveles, rachas)
+3. Vouchers QR (catálogo, canje, verificación)
+4. Leaderboard (rankings, mi posición, cercanos)
+
+**Pueden empezar a implementar**:
+- Screen 1: Login con Privy
+- Screen 5: Perfil (puntos, nivel, vouchers, leaderboard)
+
+**Deben esperar para**:
+- Screen 2: Mapa (missions/nearby pendiente)
+- Screen 4: Captura fotos (claims pendiente)
 
 ### Coordinación con Backend Team
-- Sync semanal para validar contratos de APIs
-- Notificar cambios en payload structures
-- Compartir TypeScript types (via shared package?)
+- **Doc disponible**: `backend/IMPLEMENTATION_STATUS.md`
+- **APIs documentadas**: Ver `backend/src/routes/index.js`
+- Slack #backend-dev para dudas
+- Shared types: TBD (considerar monorepo)
 
 ---
 
