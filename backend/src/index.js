@@ -6,6 +6,7 @@ import routes from './routes/index.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import logger from './config/logger.js';
 import pool from './config/database.js';
+import supabase, { testSupabaseConnection } from './config/supabase.js';
 
 dotenv.config();
 
@@ -54,13 +55,13 @@ app.use((req, res) => {
   });
 });
 
-// Database connection test
+// Database connection test (PostgreSQL - legacy)
 async function testDatabaseConnection() {
   try {
     const result = await pool.query('SELECT NOW()');
-    logger.info('Database connected successfully:', result.rows[0]);
+    logger.info('PostgreSQL (legacy) connected:', result.rows[0]);
   } catch (error) {
-    logger.warn('Database connection failed (optional):', error.message);
+    logger.warn('PostgreSQL connection failed (optional):', error.message);
   }
 }
 
@@ -70,9 +71,19 @@ app.listen(PORT, async () => {
   logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
   logger.info(`Stellar Network: ${process.env.STELLAR_NETWORK || 'testnet'}`);
 
+  // Test Supabase connection
+  const supabaseConnected = await testSupabaseConnection();
+  if (supabaseConnected) {
+    logger.info('Using Supabase as primary database');
+  } else {
+    logger.warn('Supabase not configured, some features may be unavailable');
+  }
+
+  // Test legacy PostgreSQL (optional)
   await testDatabaseConnection();
 
   logger.info('Server ready to accept connections');
+  logger.info('Auth methods: Privy (social) + Stellar (wallet)');
 });
 
 export default app;

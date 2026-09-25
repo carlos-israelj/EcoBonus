@@ -4,6 +4,7 @@ import styles from "./App.module.css"
 import ConnectAccount from "./components/ConnectAccount"
 import Debug from "./pages/Debug"
 import Home from "./pages/Home"
+import TrustlessWorkDemo from "./pages/TrustlessWorkDemo"
 
 function App() {
 	return (
@@ -12,6 +13,7 @@ function App() {
 				<Route path="/" element={<Home />} />
 				<Route path="/debug" element={<Debug />} />
 				<Route path="/debug/:contractName" element={<Debug />} />
+				<Route path="/trustless-work-demo" element={<TrustlessWorkDemo />} />
 			</Route>
 		</Routes>
 	)
@@ -20,8 +22,20 @@ function App() {
 const AppLayout = () => (
 	<div className={styles.AppLayout}>
 		<header className={styles.header}>
-			<span className={styles.logo}>Scaffold</span>
+			<span className={styles.logo}>EcoBonus</span>
 			<nav className={styles.headerNav}>
+				<NavLink
+					to="/"
+					className={({ isActive }) => (isActive ? styles.active : "")}
+				>
+					Home
+				</NavLink>
+				<NavLink
+					to="/trustless-work-demo"
+					className={({ isActive }) => (isActive ? styles.active : "")}
+				>
+					Trustless Work Demo
+				</NavLink>
 				<NavLink
 					to="/debug"
 					className={({ isActive }) => (isActive ? styles.active : "")}
@@ -42,21 +56,21 @@ const AppLayout = () => (
 		<footer className={styles.footer}>
 			<nav className={styles.footerNav}>
 				<a
-					href="https://github.com/stellar-scaffold/cli"
+					href="https://github.com/carlos-israelj/EcoBonus"
 					target="_blank"
 					rel="noreferrer"
 				>
 					GitHub
 				</a>
 				<a
-					href="https://www.youtube.com/watch?v=0syGaIn3ULk&list=PLmr3tp_7-7Gjj6gn5-bBn-QTMyaWzwOU5"
+					href="https://docs.trustlesswork.com"
 					target="_blank"
 					rel="noreferrer"
 				>
-					Tutorial
+					Trustless Work Docs
 				</a>
 				<a href="https://scaffoldstellar.org" target="_blank" rel="noreferrer">
-					View docs
+					Scaffold Docs
 				</a>
 			</nav>
 		</footer>

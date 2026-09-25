@@ -1,0 +1,279 @@
+/**
+ * useMissionEscrow Hook
+ *
+ * Wraps Trustless Work escrow functionality for EcoBonus missions.
+ * Handles the complete lifecycle: deploy → fund → claim → release
+ */
+
+import { useState, useCallback } from "react"
+import {
+	useInitializeEscrow,
+	useFundEscrow,
+	useChangeMilestoneStatus,
+	useReleaseFunds,
+	useSendTransaction,
+} from "@trustless-work/escrow/hooks"
+import { useWallet } from "./useWallet"
+import type {
+	Mission,
+	DeployEscrowPayload,
+	FundEscrowPayload,
+	ChangeMilestoneStatusPayload,
+	ReleaseFundsPayload,
+	UseMissionEscrowReturn,
+	EscrowData,
+} from "../types/trustless-work"
+
+// Admin address for EcoBonus platform (should be in env)
+const ADMIN_ADDRESS = "GBXGQJWVLWOYHFLVTKWV5FGHA3LNYY2JQKM7OAJAUEQFU6LPCSEFVXON" // Replace with actual admin address
+
+const BACKEND_URL = import.meta.env.PUBLIC_BACKEND_URL || "http://localhost:3001"
+
+export const useMissionEscrow = (): UseMissionEscrowReturn => {
+	const { address, signTransaction } = useWallet()
+	const { deployEscrow } = useInitializeEscrow()
+	const { fundEscrow } = useFundEscrow()
+	const { changeMilestoneStatus } = useChangeMilestoneStatus()
+	const { releaseFunds } = useReleaseFunds()
+	const { sendTransaction } = useSendTransaction()
+
+	const [isDeploying, setIsDeploying] = useState(false)
+	const [isFunding, setIsFunding] = useState(false)
+	const [isSubmitting, setIsSubmitting] = useState(false)
+	const [error, setError] = useState<Error | null>(null)
+
+	/**
+	 * Create a new mission by deploying a Trustless Work escrow
+	 */
+	const createMission = useCallback(
+		async (mission: Omit<Mission, "id" | "escrowId" | "claimedSlots">): Promise<string> => {
+			if (!address) {
+				throw new Error("Wallet not connected")
+			}
+
+			setIsDeploying(true)
+			setError(null)
+
+			try {
+				// Prepare deploy escrow payload
+				const payload: DeployEscrowPayload = {
+					signer: address, // Mission sponsor
+					engagementId: mission.id || `mission-${Date.now()}`,
+					title: mission.title,
+					description: mission.description,
+					roles: {
+						approver: ADMIN_ADDRESS, // Admin approves after AI validation
+						serviceProvider: "", // Will be filled when user claims
+						platformAddress: ADMIN_ADDRESS,
+						releaseSigner: ADMIN_ADDRESS,
+						disputeResolver: ADMIN_ADDRESS,
+					},
+					platformFee: 4, // 4% platform fee
+					milestones: [
+						{
+							description: `Complete mission: ${mission.title}`,
+							amount: mission.rewardAmount, // Amount in stroops
+							receiver: "", // Will be filled when user claims
+						},
+					],
+					trustline: {
+						address: "native", // Using native XLM
+						symbol: "XLM",
+					},
+				}
+
+				// Deploy escrow via Trustless Work
+				const response = await deployEscrow(payload, "multi-release")
+
+				if (!response.unsignedTransaction) {
+					throw new Error("No unsigned transaction returned from deploy")
+				}
+
+				// Sign transaction with user's wallet
+				const signedXdr = await signTransaction({
+					unsignedTransaction: response.unsignedTransaction,
+					address,
+				})
+
+				if (!signedXdr) {
+					throw new Error("Failed to sign transaction")
+				}
+
+				// Send signed transaction to blockchain
+				const result = await sendTransaction(signedXdr)
+
+				// Extract contract ID from result
+				// Note: This assumes the result contains the contractId
+				// You may need to parse the transaction result to get the actual contractId
+				const contractId = response.contractId || result.contractId || ""
+
+				console.log("✅ Escrow deployed successfully:", contractId)
+
+				return contractId
+			} catch (err) {
+				const error = err instanceof Error ? err : new Error("Failed to create mission")
+				setError(error)
+				console.error("❌ Error creating mission:", error)
+				throw error
+			} finally {
+				setIsDeploying(false)
+			}
+		},
+		[address, deployEscrow, signTransaction, sendTransaction],
+	)
+
+	/**
+	 * Fund an existing mission escrow
+	 */
+	const fundMission = useCallback(
+		async (escrowId: string, amount: string): Promise<void> => {
+			if (!address) {
+				throw new Error("Wallet not connected")
+			}
+
+			setIsFunding(true)
+			setError(null)
+
+			try {
+				const payload: FundEscrowPayload = {
+					contractId: escrowId,
+					signer: address,
+					amount, // Amount in stroops
+				}
+
+				const response = await fundEscrow(payload, "multi-release")
+
+				if (!response.unsignedTransaction) {
+					throw new Error("No unsigned transaction returned from fund")
+				}
+
+				const signedXdr = await signTransaction({
+					unsignedTransaction: response.unsignedTransaction,
+					address,
+				})
+
+				if (!signedXdr) {
+					throw new Error("Failed to sign transaction")
+				}
+
+				await sendTransaction(signedXdr)
+
+				console.log("✅ Escrow funded successfully:", escrowId)
+			} catch (err) {
+				const error = err instanceof Error ? err : new Error("Failed to fund mission")
+				setError(error)
+				console.error("❌ Error funding mission:", error)
+				throw error
+			} finally {
+				setIsFunding(false)
+			}
+		},
+		[address, fundEscrow, signTransaction, sendTransaction],
+	)
+
+	/**
+	 * Submit a claim by changing milestone status
+	 * This triggers the AI validation workflow in the backend
+	 */
+	const submitClaim = useCallback(
+		async (escrowId: string, evidenceUri: string, userAddress: string): Promise<void> => {
+			if (!address) {
+				throw new Error("Wallet not connected")
+			}
+
+			setIsSubmitting(true)
+			setError(null)
+
+			try {
+				const payload: ChangeMilestoneStatusPayload = {
+					contractId: escrowId,
+					milestoneIndex: "0", // First milestone
+					newEvidence: evidenceUri, // IPFS hash
+					newStatus: "submitted",
+					serviceProvider: userAddress,
+				}
+
+				const response = await changeMilestoneStatus(payload, "multi-release")
+
+				if (!response.unsignedTransaction) {
+					throw new Error("No unsigned transaction returned from change status")
+				}
+
+				const signedXdr = await signTransaction({
+					unsignedTransaction: response.unsignedTransaction,
+					address,
+				})
+
+				if (!signedXdr) {
+					throw new Error("Failed to sign transaction")
+				}
+
+				await sendTransaction(signedXdr)
+
+				console.log("✅ Claim submitted successfully:", escrowId)
+
+				// Trigger backend AI validation webhook
+				try {
+					await fetch(`${BACKEND_URL}/api/validate-claim`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({
+							escrowId,
+							evidenceUri,
+							userAddress,
+						}),
+					})
+					console.log("✅ AI validation triggered")
+				} catch (webhookError) {
+					console.warn("⚠️ Failed to trigger AI validation webhook:", webhookError)
+					// Don't throw - claim submission succeeded, webhook is secondary
+				}
+			} catch (err) {
+				const error = err instanceof Error ? err : new Error("Failed to submit claim")
+				setError(error)
+				console.error("❌ Error submitting claim:", error)
+				throw error
+			} finally {
+				setIsSubmitting(false)
+			}
+		},
+		[address, changeMilestoneStatus, signTransaction, sendTransaction],
+	)
+
+	/**
+	 * Get escrow data
+	 * Note: This requires implementing a query to the Trustless Work indexer
+	 * or using the REST API to fetch escrow details
+	 */
+	const getEscrow = useCallback(
+		async (escrowId: string): Promise<EscrowData | null> => {
+			try {
+				// TODO: Implement fetching escrow data from Trustless Work API
+				// This would use the getEscrowsByContractIds endpoint
+				const response = await fetch(`${BACKEND_URL}/api/escrow/${escrowId}`)
+				if (!response.ok) {
+					throw new Error("Failed to fetch escrow data")
+				}
+				const data = await response.json()
+				return data as EscrowData
+			} catch (err) {
+				console.error("❌ Error fetching escrow:", err)
+				return null
+			}
+		},
+		[],
+	)
+
+	return {
+		createMission,
+		fundMission,
+		submitClaim,
+		getEscrow,
+		isDeploying,
+		isFunding,
+		isSubmitting,
+		error,
+	}
+}

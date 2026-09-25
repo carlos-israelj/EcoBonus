@@ -1,7 +1,7 @@
 import { labPrefix } from "@stellar-scaffold/app-lib"
 import React from "react"
 import { Link } from "react-router-dom"
-import { GuessTheNumber } from "../components/GuessTheNumber"
+// import { GuessTheNumber } from "../components/GuessTheNumber"
 import styles from "./Home.module.css"
 
 const Home: React.FC = () => (
@@ -22,17 +22,12 @@ const Home: React.FC = () => (
 		<div className="card">
 			<h2>Sample Contracts</h2>
 			<p>
-				<strong>Guess The Number:</strong> Interact with the sample contract
-				from the{" "}
-				<Link
-					to="https://scaffoldstellar.org/docs/tutorial/overview"
-					target="_blank"
-				>
-					Scaffold Tutorial
-				</Link>{" "}
-				using an automatically generated contract client.
+				<strong>EcoBonus Demo:</strong> Test the Trustless Work integration{" "}
+				<Link to="/trustless-work-demo">
+					Try Trustless Work Demo
+				</Link>
 			</p>
-			<GuessTheNumber />
+			{/* <GuessTheNumber /> */}
 			<p>Or take a look at other sample contracts to get you started:</p>
 			<nav className={styles.contractNav}>
 				<a
