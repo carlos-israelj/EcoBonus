@@ -18,57 +18,77 @@
 
 ---
 
-## 📊 Estado Actual (Sep 24, 2026)
+## 📊 Estado Actual (Sep 24, 2026) - ACTUALIZADO
 
 ### ✅ Infraestructura Construida
-- Smart Contracts en Stellar Testnet
+- **Smart Contracts en Stellar Testnet**
   - MissionContract: `CAIFF...R47V`
   - RewardContract: `CBUPDKP...G6PO`
   - CertificateNFT: `CCM2NUS...B5LS`
-- Backend API (Node.js + Express)
-- AI Validation Service (DETR model)
-- Trustless Work integration (escrow)
+- **Backend API** (Node.js + Express + Supabase)
+- **AI Validation Service** (DETR model)
+- **Trustless Work integration** (escrow)
+- **Supabase Database** (10 tablas desplegadas)
+- **Privy Authentication** (social login + embedded wallets)
 
-### ❌ Gaps vs PRD (Críticos)
-1. **No hay sistema de puntos** - Distribuimos XLM directo
-2. **No hay autenticación Privy** - Solo Stellar wallets
-3. **No hay mapa interactivo** - Falta UI de descubrimiento
-4. **No hay validación manual** - Solo AI auto-approval
-5. **No hay catálogo de vouchers** - Core feature missing
-6. **No hay gaming** (niveles/rachas/leaderboard)
-7. **Solo 1 foto** - PRD requiere antes/después
+### ✅ Features Implementadas (NUEVO)
+1. **Sistema de Puntos** ✅ - Ledger en Supabase, niveles, rachas
+2. **Autenticación Dual** ✅ - Privy (social) + Stellar (wallet opcional)
+3. **Vouchers QR** ✅ - Catálogo, canje, expiración
+4. **Dashboard Validadores** ✅ - Cola, aprobar/rechazar, stats
+5. **Leaderboard** ✅ - Rankings con caché de 5min
+6. **Gaming** ✅ - Niveles, XP, rachas, bonos
+
+### ❌ Gaps vs PRD (Pendientes)
+1. **Misiones GPS** ❌ - Falta geo-discovery con PostGIS
+2. **Fotos Before/After** ❌ - Falta validación dual con EXIF GPS
+3. **IPFS Metadata** ❌ - Para RWA certificates
+4. **Fee-Sponsored Txs** ❌ - Admin paga gas fees
+5. **Soul-Bound NFTs** ❌ - Minteo de certificados
 
 ---
 
 ## 🗺️ Roadmap por Fases
 
-### 🏗️ FASE 0: Rebase (Sep 24 - Oct 7) ← ACTUAL
-**Objetivo**: Migrar a arquitectura PRD-compliant
+### 🏗️ FASE 0: Rebase (Sep 24 - Oct 7) ← **75% COMPLETADO** ✅
 
-**Semana 1** (Sep 24-30):
-- [ ] Setup Supabase (reemplaza PostgreSQL)
-- [ ] Integrar Privy authentication (backend + frontend)
-- [ ] Crear schema de base de datos (10 tablas nuevas)
-- [ ] Documentar APIs (OpenAPI spec)
+**Decisión Arquitectónica**: Sistema Híbrido Privy + Supabase + Wallet Opcional
+- ❌ NO usar Magic.link
+- ✅ Privy para social login (Google/Email)
+- ✅ Puntos en database (Supabase), no blockchain
+- ✅ Wallet Stellar OPCIONAL (solo para NFTs)
 
-**Semana 2** (Oct 1-7):
-- [ ] Implementar Points System (backend)
-- [ ] Migrar storage a Supabase
+**Semana 1** (Sep 24-30): ✅ COMPLETADO
+- [x] Setup Supabase (reemplaza PostgreSQL)
+- [x] Integrar Privy authentication (backend)
+- [x] Crear schema de base de datos (10 tablas nuevas)
+- [x] Trustless Work integration actualizada
+
+**Semana 2** (Oct 1-7): ✅ COMPLETADO
+- [x] Implementar Points System (backend)
+- [x] Voucher System con QR codes
+- [x] Validator Dashboard backend
+- [x] Leaderboard con caché
+
+**Pendiente de FASE 0**:
 - [ ] Frontend: Login con Privy
 - [ ] Frontend: Pantalla de perfil (puntos/nivel)
 
-**Entregable**: Sistema de puntos funcionando, auth social activa
+**Entregable**: Backend completo, frontend pendiente (otro equipo)
 
 ---
 
-### 🎯 FASE 1: MVP Core (Oct 8 - Oct 28)
-**Objetivo**: Flujo end-to-end usuario → misión → validación → puntos
+### 🎯 FASE 1: MVP Core (Oct 8 - Oct 28) ← **PRÓXIMA FASE**
+**Objetivo**: Misiones GPS + Validación de fotos dual
 
-#### Sprint 1: Mapa y Misiones (Oct 8-14)
+**Prioridad**: Alta (Core Feature)
+
+#### Sprint 1: Misiones con GPS (Oct 8-14)
 **Backend**:
-- [ ] API `/api/missions/nearby` (geo-queries)
+- [ ] SQL function `missions_nearby()` con PostGIS
+- [ ] API `/api/missions/nearby?lat=X&lon=Y&radius=5000`
 - [ ] Generar códigos de zona (LM-RIM-0412)
-- [ ] Endpoint de misión por ID
+- [ ] Trigger GPS distance validation
 
 **Frontend**:
 - [ ] MapLibre GL integration
@@ -76,82 +96,93 @@
 - [ ] Ficha de misión (popup)
 - [ ] Filtros: Focos/Ríos/Playas/Parques
 
-#### Sprint 2: Evidencia Dual (Oct 15-21)
+#### Sprint 2: Fotos Before/After con GPS (Oct 15-21)
 **Backend**:
-- [ ] Endpoint `/api/claims` (2 fotos + GPS + bags)
-- [ ] Upload a Supabase Storage
+- [ ] Install `exif-parser` package
+- [ ] Validar coordenadas GPS en EXIF de fotos
+- [ ] Comparar GPS de fotos vs ubicación de misión (max 100m)
+- [ ] Validar timestamp (before < after)
 - [ ] Perceptual hashing (anti-duplicados)
-- [ ] AI validation (ambas fotos)
 
 **Frontend**:
 - [ ] Pantalla captura foto ANTES
-- [ ] GPS verification UI
+- [ ] GPS verification UI (círculo 20m)
 - [ ] Pantalla captura foto DESPUÉS
 - [ ] Input: bolsas recolectadas
 - [ ] Envío a validación
 
-#### Sprint 3: Validación Manual (Oct 22-28)
+#### Sprint 3: IPFS + RWA Metadata (Oct 22-28)
 **Backend**:
-- [ ] API `/api/claims/pending` (cola)
-- [ ] Endpoints approve/reject
-- [ ] Trustless Work manual trigger
-- [ ] Award points logic
+- [ ] Setup IPFS client (Infura/Pinata)
+- [ ] Upload fotos a IPFS
+- [ ] Generar metadata JSON (RWA format)
+- [ ] Retornar IPFS URI: `ipfs://Qm...`
 
-**Frontend (Admin Dashboard)**:
-- [ ] Lista de claims pendientes
-- [ ] Galería de fotos
-- [ ] Botones Aprobar/Rechazar
-- [ ] Supabase Realtime (notificaciones)
+**Metadata Format**:
+```json
+{
+  "name": "EcoBonus Impact Certificate #123",
+  "image": "ipfs://QmAfter.../",
+  "properties": {
+    "before_photo": "ipfs://QmBefore.../",
+    "after_photo": "ipfs://QmAfter.../",
+    "gps_coordinates": {"latitude": 20.6274, "longitude": -87.0729},
+    "co2_reduced": 50,
+    "verified_by": "human_validator"
+  }
+}
+```
 
-**Entregable**: Usuario puede completar misión y recibir puntos tras validación manual
+**Entregable**: Misiones GPS + Fotos validadas + IPFS metadata
 
 ---
 
-### 🎁 FASE 2: Vouchers (Oct 29 - Nov 11)
+### 🎁 FASE 2: Vouchers (Oct 29 - Nov 11) ✅ **COMPLETADO (Backend)**
 **Objetivo**: Canje de puntos por productos físicos
 
-#### Sprint 4: Catálogo de Sponsors (Oct 29 - Nov 4)
+#### Sprint 4: Catálogo de Sponsors ✅ COMPLETADO
 **Backend**:
-- [ ] Tabla `sponsors` + `sponsor_products`
-- [ ] CRUD de productos (admin)
-- [ ] API `/api/vouchers/catalog`
+- [x] Tabla `sponsor_products` creada
+- [x] CRUD de productos (admin)
+- [x] API `/api/vouchers/catalog`
+- [x] 3 productos de ejemplo insertados
 
 **Frontend**:
-- [ ] Pantalla de catálogo
-  - Arroz 1kg = 250 pts
-  - Aceite 1L = 300 pts
-  - Útiles = 180 pts
+- [ ] Pantalla de catálogo (otro equipo)
 - [ ] Filtros por categoría
 
-#### Sprint 5: Redemption (Nov 5-11)
+#### Sprint 5: Redemption ✅ COMPLETADO (Backend)
 **Backend**:
-- [ ] API `/api/vouchers/redeem`
-- [ ] Generar QR único
-- [ ] VoucherRedeemContract.redeem()
-- [ ] Deducir puntos
+- [x] API `/api/vouchers/redeem`
+- [x] Generar QR único (UUID)
+- [x] Deducir puntos
+- [x] Control de stock automático
+- [x] Sistema de expiración
+- [x] Endpoints para tiendas: `/api/vouchers/verify/:qrCode` y `/api/vouchers/redeem-qr`
 
 **Frontend**:
-- [ ] Flow de canje
+- [ ] Flow de canje (otro equipo)
 - [ ] Pantalla QR code
 - [ ] Mis vouchers activos
 
 **Smart Contracts**:
-- [ ] Deploy VoucherRedeemContract
-- [ ] On-chain proof de canje
+- [ ] Deploy VoucherRedeemContract (PENDIENTE - opcional)
+- [ ] On-chain proof de canje (PENDIENTE - low priority)
 
-**Entregable**: Usuario puede canjear puntos por voucher con QR
+**Entregable**: ✅ Backend completo, frontend pendiente
 
 ---
 
-### 🎮 FASE 3: Gamification (Nov 12 - Nov 25)
+### 🎮 FASE 3: Gamification (Nov 12 - Nov 25) ✅ **COMPLETADO (Backend)**
 **Objetivo**: Retención mediante juego
 
-#### Sprint 6: Niveles y Rachas (Nov 12-18)
+#### Sprint 6: Niveles y Rachas ✅ COMPLETADO
 **Backend**:
-- [ ] Fórmula de niveles (XP → Level)
-- [ ] Sistema de rachas (días consecutivos)
-- [ ] Bonus por rachas >5 días
-- [ ] Auto-mint NFT en level-up
+- [x] Fórmula de niveles: `level = sqrt(experience/100) + 1`
+- [x] Sistema de rachas (días consecutivos)
+- [x] Bonus por rachas >5 días (+10 pts)
+- [x] Trigger automático de actualización de rachas
+- [ ] Auto-mint NFT en level-up (PENDIENTE - FASE 4)
 
 **Frontend**:
 - [ ] Barra de progreso de nivel
@@ -159,41 +190,57 @@
 - [ ] Indicador de racha
 - [ ] Animación level-up
 
-#### Sprint 7: Leaderboard (Nov 19-25)
+#### Sprint 7: Leaderboard ✅ COMPLETADO (Backend)
 **Backend**:
-- [ ] Tabla `leaderboard_cache`
-- [ ] Rankings: universidad, distrito, nacional
-- [ ] Cron job (actualizar cada hora)
+- [x] Tabla `leaderboard_cache` creada
+- [x] Rankings por: puntos, zonas, bolsas, rachas
+- [x] Períodos: daily, weekly, monthly, all_time
+- [x] Segmentos: universidad, distrito
+- [x] Caché de 5 minutos
+- [x] APIs: `/api/leaderboard`, `/api/leaderboard/my-rank`, `/api/leaderboard/surrounding`
 
 **Frontend**:
 - [ ] Vista "Top 12 · tu universidad"
 - [ ] Pestañas: Semanal/Mensual/All-time
 - [ ] Destacar posición del usuario
 
-**Entregable**: Sistema completo de gamification funcionando
+**Entregable**: ✅ Backend completo, frontend pendiente
 
 ---
 
-### 🏆 FASE 4: NFT Achievements (Nov 26 - Dec 2)
-**Objetivo**: Logros on-chain (soul-bound)
+### 🏆 FASE 4: Soul-Bound NFTs + Fee-Sponsored Txs (Nov 26 - Dec 2) ❌ PENDIENTE
+**Objetivo**: Logros on-chain (soul-bound) + Transacciones sponsoreadas
+
+**Prioridad**: Media (Blockchain features)
 
 **Smart Contracts**:
 - [ ] Modificar CertificateNFT (non-transferable)
 - [ ] Bloquear función `transfer()`
+- [ ] Testing en testnet
 
-**Backend**:
+**Backend - NFT Minting**:
+- [ ] Service: `src/services/nft.service.js`
+- [ ] Función `mintImpactCertificate(userId, stellarAddress, impactData, metadataURI)`
+- [ ] Validar que usuario tenga wallet conectada
 - [ ] Auto-mint en hitos:
   - 10 misiones
   - 50 misiones
   - Nivel 5
   - Racha 30 días
 
+**Backend - Fee-Sponsored Transactions**:
+- [ ] Service: `src/services/stellar.service.js`
+- [ ] Función `sponsorTransaction(userPublicKey, operation)`
+- [ ] Admin wallet firma y paga fees
+- [ ] Usuario solo aprueba operación
+
 **Frontend**:
 - [ ] Galería de badges
 - [ ] "Guardián Urbano · Nv. 4"
 - [ ] Share en redes
+- [ ] Conectar wallet (opcional)
 
-**Entregable**: NFTs de logros (non-transferable) funcionando
+**Entregable**: NFTs soul-bound + fee sponsorship funcionando
 
 ---
 
@@ -280,27 +327,33 @@
 
 ---
 
-## 🎯 Próximos 7 Días (Sep 24-30)
+## 🎯 Próximos 7 Días (Oct 8-14) - **SPRINT ACTUAL**
 
-### Backend
-1. Setup Supabase project
-2. Run SQL schema (10 tables)
-3. Integrate Privy auth middleware
-4. Points System API (`/api/points/*`)
+### Backend (Alta Prioridad)
+1. ✅ **Agregar SQL function `missions_nearby()`** con PostGIS
+   - Archivo: `supabase-schema.sql`
+   - Function que retorna misiones dentro de radio X
+2. ✅ **Implementar endpoint GPS missions**
+   - Archivo: `src/controllers/mission.controller.js`
+   - `GET /api/missions/nearby?lat=X&lon=Y&radius=5000`
+3. ✅ **Validación de fotos con EXIF GPS**
+   - Install: `npm install exif-parser`
+   - Crear: `src/utils/photoValidator.js`
+   - Integrar en `src/controllers/claim.controller.js`
 
-### Frontend
+### Frontend (Otro Equipo)
 1. Install Privy React SDK
 2. Login screen con social options
-3. Profile screen (puntos/nivel)
-4. MapLibre GL spike
+3. Mapa con misiones cercanas
+4. Captura de fotos dual
 
 ### Documentation
-1. OpenAPI spec para backend APIs
-2. Frontend component library doc
-3. Database ER diagram
+1. ✅ `IMPLEMENTATION_STATUS.md` creado
+2. Actualizar OpenAPI spec
+3. Compartir con frontend team
 
 ---
 
-**Aprobado por**: Equipo EcoBonus
-**Próxima Revisión**: 2026-10-01
-**Estado**: FASE 0 en progreso
+**Última Actualización**: 2026-09-24
+**Próxima Revisión**: 2026-10-08
+**Estado**: FASE 0 completada (75%), FASE 1 iniciando
