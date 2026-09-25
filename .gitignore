@@ -44,3 +44,5 @@ app-lib/clients/*
 
 # TypeScript incremental build info
 *.tsbuildinfo
+
+tools/cloudflared.exe
