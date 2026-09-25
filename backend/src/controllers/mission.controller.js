@@ -1,11 +1,12 @@
 import stellarService from '../services/stellar.service.js';
 import logger from '../config/logger.js';
 import pool from '../config/database.js';
+import supabase from '../config/supabase.js';
 
 class MissionController {
   /**
    * GET /api/missions/nearby
-   * Get missions near a location
+   * Get missions near a location using PostGIS
    */
   async getNearbyMissions(req, res) {
     try {
@@ -27,20 +28,42 @@ class MissionController {
         });
       }
 
-      // Get missions from blockchain
-      const missions = await stellarService.getNearbyMissions(
-        latitude,
-        longitude,
-        radiusMeters
-      );
+      // Validate coordinates range
+      if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+        return res.status(400).json({
+          error: 'Invalid coordinates: lat must be -90 to 90, lon must be -180 to 180',
+        });
+      }
 
-      // Enrich with cached data from database
-      const enrichedMissions = await this.enrichMissionsFromDB(missions);
+      logger.info(`Searching missions near (${latitude}, ${longitude}) within ${radiusMeters}m`);
+
+      // Call PostGIS function missions_nearby()
+      const { data: missions, error } = await supabase.rpc('missions_nearby', {
+        user_lat: latitude,
+        user_lon: longitude,
+        radius_meters: radiusMeters
+      });
+
+      if (error) {
+        logger.error('Error calling missions_nearby function:', error);
+        return res.status(500).json({
+          error: 'Failed to fetch nearby missions',
+          message: error.message,
+          hint: error.hint || 'Make sure missions_nearby() function exists in Supabase'
+        });
+      }
+
+      logger.info(`Found ${missions?.length || 0} missions within radius`);
 
       res.json({
         success: true,
-        count: enrichedMissions.length,
-        data: enrichedMissions,
+        count: missions?.length || 0,
+        radius_meters: radiusMeters,
+        center: {
+          latitude,
+          longitude
+        },
+        data: missions || [],
       });
     } catch (error) {
       logger.error('Error in getNearbyMissions:', error);
