@@ -1,7 +1,9 @@
 import stellarService from '../services/stellar.service.js';
 import ipfsService from '../services/ipfs.service.js';
+import photoValidationService from '../services/photoValidation.service.js';
 import logger from '../config/logger.js';
 import pool from '../config/database.js';
+import supabase from '../config/supabase.js';
 
 class ClaimController {
   /**
@@ -216,6 +218,254 @@ class ClaimController {
       logger.error(`Error in getUserClaims (${req.params.address}):`, error);
       res.status(500).json({
         error: 'Failed to fetch user claims',
+        message: error.message,
+      });
+    }
+  }
+
+  /**
+   * POST /api/claims/:id/validate-photos
+   * Validate before/after photos for a claim
+   */
+  async validatePhotos(req, res) {
+    try {
+      const { id } = req.params;
+
+      // Check if photos were uploaded
+      if (!req.files || !req.files.before || !req.files.after) {
+        return res.status(400).json({
+          error: 'Both before and after photos are required',
+        });
+      }
+
+      const beforePhoto = req.files.before[0].buffer;
+      const afterPhoto = req.files.after[0].buffer;
+
+      // Get claim to fetch mission details
+      const { data: claim, error: claimError } = await supabase
+        .from('claims')
+        .select('mission_id')
+        .eq('id', id)
+        .single();
+
+      if (claimError || !claim) {
+        return res.status(404).json({
+          error: 'Claim not found',
+        });
+      }
+
+      // Get mission details
+      const { data: mission, error: missionError } = await supabase
+        .from('missions')
+        .select('latitude, longitude, radius_meters')
+        .eq('id', claim.mission_id)
+        .single();
+
+      if (missionError || !mission) {
+        return res.status(404).json({
+          error: 'Mission not found',
+        });
+      }
+
+      // Validate photos
+      const validation = await photoValidationService.validateBeforeAfterPhotos(
+        beforePhoto,
+        afterPhoto,
+        mission
+      );
+
+      // Store validation result in database
+      await supabase
+        .from('claims')
+        .update({
+          validation_score: validation.score,
+          validation_result: validation,
+          photo_before_hash: validation.before.hash,
+          photo_after_hash: validation.after.hash,
+          photo_validated_at: new Date().toISOString(),
+        })
+        .eq('id', id);
+
+      logger.info(`Photo validation for claim ${id}: ${validation.valid ? 'VALID' : 'INVALID'} (${validation.score}/100)`);
+
+      res.json({
+        success: true,
+        claimId: id,
+        validation,
+      });
+    } catch (error) {
+      logger.error(`Error in validatePhotos (${req.params.id}):`, error);
+      res.status(500).json({
+        error: 'Failed to validate photos',
+        message: error.message,
+      });
+    }
+  }
+
+  /**
+   * POST /api/claims/:id/upload-before
+   * Upload and validate before photo
+   */
+  async uploadBeforePhoto(req, res) {
+    try {
+      const { id } = req.params;
+
+      if (!req.file) {
+        return res.status(400).json({
+          error: 'Photo file is required',
+        });
+      }
+
+      const photoBuffer = req.file.buffer;
+
+      // Get claim and mission
+      const { data: claim } = await supabase
+        .from('claims')
+        .select('mission_id')
+        .eq('id', id)
+        .single();
+
+      const { data: mission } = await supabase
+        .from('missions')
+        .select('latitude, longitude, radius_meters')
+        .eq('id', claim.mission_id)
+        .single();
+
+      // Extract GPS and validate
+      const gps = await photoValidationService.extractGPSFromPhoto(photoBuffer);
+      const locationValidation = photoValidationService.validatePhotoLocation(gps, mission);
+      const photoHash = await photoValidationService.calculatePhotoHash(photoBuffer);
+      const metadata = await photoValidationService.getImageMetadata(photoBuffer);
+
+      // Upload to IPFS
+      const ipfsResult = await ipfsService.uploadPhoto(photoBuffer, {
+        claimId: id,
+        type: 'before',
+        gps,
+        hash: photoHash,
+      });
+
+      // Store in database
+      await supabase
+        .from('claims')
+        .update({
+          photo_before_url: ipfsResult.url,
+          photo_before_hash: photoHash,
+          photo_before_gps: gps,
+          photo_before_metadata: metadata,
+          photo_before_location_valid: locationValidation.valid,
+        })
+        .eq('id', id);
+
+      res.json({
+        success: true,
+        claimId: id,
+        photo: {
+          url: ipfsResult.url,
+          hash: photoHash,
+          gps,
+          locationValidation,
+          metadata,
+        },
+      });
+    } catch (error) {
+      logger.error(`Error in uploadBeforePhoto (${req.params.id}):`, error);
+      res.status(500).json({
+        error: 'Failed to upload before photo',
+        message: error.message,
+      });
+    }
+  }
+
+  /**
+   * POST /api/claims/:id/upload-after
+   * Upload and validate after photo
+   */
+  async uploadAfterPhoto(req, res) {
+    try {
+      const { id } = req.params;
+
+      if (!req.file) {
+        return res.status(400).json({
+          error: 'Photo file is required',
+        });
+      }
+
+      const photoBuffer = req.file.buffer;
+
+      // Get claim and mission
+      const { data: claim } = await supabase
+        .from('claims')
+        .select('mission_id, photo_before_hash')
+        .eq('id', id)
+        .single();
+
+      const { data: mission } = await supabase
+        .from('missions')
+        .select('latitude, longitude, radius_meters')
+        .eq('id', claim.mission_id)
+        .single();
+
+      // Extract GPS and validate
+      const gps = await photoValidationService.extractGPSFromPhoto(photoBuffer);
+      const locationValidation = photoValidationService.validatePhotoLocation(gps, mission);
+      const photoHash = await photoValidationService.calculatePhotoHash(photoBuffer);
+      const metadata = await photoValidationService.getImageMetadata(photoBuffer);
+
+      // Compare with before photo
+      let photoComparison = null;
+      if (claim.photo_before_hash) {
+        photoComparison = photoValidationService.comparePhotoHashes(
+          claim.photo_before_hash,
+          photoHash
+        );
+      }
+
+      // Upload to IPFS
+      const ipfsResult = await ipfsService.uploadPhoto(photoBuffer, {
+        claimId: id,
+        type: 'after',
+        gps,
+        hash: photoHash,
+      });
+
+      // Calculate overall validation score
+      let validationScore = 0;
+      if (locationValidation.valid) validationScore += 50;
+      if (gps.hasGPS) validationScore += 10;
+      if (photoComparison && !photoComparison.isIdentical) validationScore += 40;
+
+      // Store in database
+      await supabase
+        .from('claims')
+        .update({
+          photo_after_url: ipfsResult.url,
+          photo_after_hash: photoHash,
+          photo_after_gps: gps,
+          photo_after_metadata: metadata,
+          photo_after_location_valid: locationValidation.valid,
+          photo_comparison: photoComparison,
+          validation_score: validationScore,
+        })
+        .eq('id', id);
+
+      res.json({
+        success: true,
+        claimId: id,
+        photo: {
+          url: ipfsResult.url,
+          hash: photoHash,
+          gps,
+          locationValidation,
+          metadata,
+        },
+        photoComparison,
+        validationScore,
+      });
+    } catch (error) {
+      logger.error(`Error in uploadAfterPhoto (${req.params.id}):`, error);
+      res.status(500).json({
+        error: 'Failed to upload after photo',
         message: error.message,
       });
     }

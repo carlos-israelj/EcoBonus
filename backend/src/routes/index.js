@@ -8,6 +8,7 @@ import voucherController from '../controllers/voucher.controller.js';
 import validatorController from '../controllers/validator.controller.js';
 import leaderboardController from '../controllers/leaderboard.controller.js';
 import { authenticateUser, requireAdmin, requireValidator, optionalAuth } from '../middleware/dualAuth.js';
+import { uploadSingle, uploadPhotos, handleUploadError } from '../middleware/upload.js';
 
 const router = express.Router();
 
@@ -20,6 +21,11 @@ router.get('/missions/:id/claims', missionController.getMissionClaims);
 router.post('/claims', claimController.submitClaim);
 router.get('/claims/:id', claimController.getClaimById);
 router.post('/claims/:id/validate', claimController.validateClaim);
+
+// Photo validation routes (new)
+router.post('/claims/:id/validate-photos', uploadPhotos, handleUploadError, claimController.validatePhotos);
+router.post('/claims/:id/upload-before', uploadSingle, handleUploadError, claimController.uploadBeforePhoto);
+router.post('/claims/:id/upload-after', uploadSingle, handleUploadError, claimController.uploadAfterPhoto);
 
 // User routes
 router.get('/users/:address', userController.getUserProfile);
@@ -81,6 +87,8 @@ router.get('/health', (req, res) => {
       leaderboard: 'enabled',
       validator: 'enabled',
       trustlessWork: 'integrated',
+      gps: 'enabled (PostGIS)',
+      photoValidation: 'enabled (EXIF + perceptual hash)',
     },
     timestamp: new Date().toISOString(),
   });
