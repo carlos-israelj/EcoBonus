@@ -44,3 +44,4 @@ app-lib/clients/*
 
 # TypeScript incremental build info
 *.tsbuildinfo
+.local-notes/
