@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import ws from 'ws';
 import dotenv from 'dotenv';
 import logger from './logger.js';
 
@@ -16,6 +17,12 @@ const supabase = createClient(supabaseUrl || '', supabaseServiceKey || '', {
   auth: {
     autoRefreshToken: false,
     persistSession: false,
+  },
+  global: {
+    fetch: fetch,
+  },
+  realtime: {
+    transport: ws,
   },
 });
 
