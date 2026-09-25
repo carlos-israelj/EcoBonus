@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION missions_nearby(
   user_lat NUMERIC,
   user_lon NUMERIC,
-  radius_meters INTEGER DEFAULT 5000
+  search_radius_meters INTEGER DEFAULT 5000
 )
 RETURNS TABLE (
   id UUID,
@@ -48,7 +48,7 @@ BEGIN
     AND ST_DWithin(
       m.location,
       ST_SetSRID(ST_MakePoint(user_lon, user_lat), 4326)::geography,
-      radius_meters
+      search_radius_meters
     )
   ORDER BY distance_meters ASC;
 END;

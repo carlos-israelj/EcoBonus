@@ -39,7 +39,7 @@ async function executeSQLFunction() {
     const { data, error } = await supabase.rpc('missions_nearby', {
       user_lat: -12.116373,
       user_lon: -77.031105,
-      radius_meters: 1000
+      search_radius_meters: 1000
     });
 
     if (error) {
