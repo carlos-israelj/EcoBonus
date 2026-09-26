@@ -102,14 +102,14 @@ async function apiFetch<T>(
     })
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: response.statusText }))
+      const error = await response.json().catch(() => ({ message: response.statusText })) as { message?: string }
       throw new Error(error.message || `HTTP ${response.status}`)
     }
 
-    return await response.json()
-  } catch (error) {
+    return await response.json() as T
+  } catch (error: unknown) {
     console.error(`[API] Error fetching ${endpoint}:`, error)
-    throw error
+    throw error instanceof Error ? error : new Error(String(error))
   }
 }
 
@@ -192,11 +192,11 @@ export async function uploadBeforePhoto(
   })
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: response.statusText }))
+    const error = await response.json().catch(() => ({ message: response.statusText })) as { message?: string }
     throw new Error(error.message || `HTTP ${response.status}`)
   }
 
-  return response.json()
+  return response.json() as Promise<ApiResponse<{ photo_url: string; exif_gps: { lat: number; lon: number } | null }>>
 }
 
 /**
@@ -219,11 +219,11 @@ export async function uploadAfterPhoto(
   })
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: response.statusText }))
+    const error = await response.json().catch(() => ({ message: response.statusText })) as { message?: string }
     throw new Error(error.message || `HTTP ${response.status}`)
   }
 
-  return response.json()
+  return response.json() as Promise<ApiResponse<{ photo_url: string; exif_gps: { lat: number; lon: number } | null }>>
 }
 
 /**
