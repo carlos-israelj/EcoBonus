@@ -1,45 +1,16 @@
-import { guessTheNumber } from "@stellar-scaffold/app-lib/clients"
 import { useState } from "react"
-import { useWallet } from "../hooks/useWallet"
 
 export const GuessTheNumber = () => {
-	const { address, updateBalances, signTransaction } = useWallet()
-	const [result, setResult] = useState<
-		"idle" | "loading" | "success" | "failure"
-	>("idle")
+	const [result, setResult] = useState<"idle" | "success" | "failure">("idle")
 
 	const submitGuess = async (formData: FormData) => {
-		if (!address) {
-			setResult("failure")
-			return
-		}
-
 		const guess = formData.get("guess")
 		if (typeof guess != "string" || !guess) {
 			setResult("failure")
 			return
 		}
 
-		setResult("loading")
-
-		try {
-			const tx = await guessTheNumber.guess(
-				{ a_number: BigInt(guess), guesser: address },
-				{ publicKey: address },
-			)
-
-			const { result } = await tx.signAndSend({ signTransaction })
-
-			if (result.isErr()) {
-				console.error(result.unwrapErr())
-			} else {
-				setResult(result.unwrap() ? "success" : "failure")
-				await updateBalances()
-			}
-		} catch (e) {
-			console.error(e)
-			setResult("failure")
-		}
+		setResult(guess === "7" ? "success" : "failure")
 	}
 
 	const reset = () => setResult("idle")
@@ -55,7 +26,7 @@ export const GuessTheNumber = () => {
 					max="10"
 					onChange={reset}
 				/>
-				<button type="submit" disabled={result === "loading"}>
+				<button type="submit">
 					Submit
 				</button>
 			</form>
@@ -70,11 +41,7 @@ export const GuessTheNumber = () => {
 			)}
 			{result === "failure" && (
 				<div className="card guess-result guess-result--failure">
-					{!address ? (
-						<p>Connect to your wallet in order to guess.</p>
-					) : (
-						<p>Incorrect guess. Try again!</p>
-					)}
+					<p>Incorrect guess. Try again!</p>
 				</div>
 			)}
 		</div>

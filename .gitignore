@@ -44,4 +44,9 @@ app-lib/clients/*
 
 # TypeScript incremental build info
 *.tsbuildinfo
+
+# Local notes
 .local-notes/
+
+# Cloudflare tunnel
+tools/cloudflared.exe
