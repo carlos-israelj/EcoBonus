@@ -1,242 +1,701 @@
-# EcoBonus - Clean-to-Earn Platform
+<div align="center">
 
-**Democratizando la ecología urbana en Perú mediante blockchain**
+<img src="./templates/react/public/icons/logo.svg" alt="EcoBonus Logo" width="120" height="120">
 
-EcoBonus es la primera plataforma Clean-to-Earn de América Latina que transforma la acción cívica de limpieza urbana en Real World Assets (RWA) verificables en blockchain pública, democratizando el acceso a recompensas ambientales mediante validación por IA y micropagos instantáneos en stablecoins.
+# EcoBonus
 
-## Propuesta de Valor
+**Clean-to-Earn Platform with Blockchain-Verified Environmental Impact**
 
-_Tradicionalmente, la limpieza de las ciudades dependía solo de los municipios o de los recicladores. Nuestro MVP democratiza la ecología urbana: permitimos que cualquier peruano de a pie, en su ruta diaria al mercado o al estudio, se convierta en un recolector por oportunidad, transformando minutos libres en impacto ambiental verificable on-chain y recompensas reales_.
+Transform urban cleaning into Real World Assets on Stellar
 
-_Nuestro MVP es un juego de Clean-to-Earn donde el mapa es la ciudad real y las misiones son focos de basura activa. La innovación radica en que cada acción de limpieza se convierte en un RWA (Real World Asset) en la red Stellar: un certificado de impacto ambiental transparente y auditable para el Ministerio del Ambiente, respaldado por un sistema de recompensas con valor comercial real financiado por nuestros patrocinadores_.
+[Live Demo](https://carlos-israelj.github.io/EcoBonus/) · [Smart Contracts](#smart-contracts-testnet) · [GitHub](https://github.com/carlos-israelj/EcoBonus) · [Documentation](#documentation)
 
-## Características Principales
+---
 
-- 🌍 **Misiones Geolocalizadas**: Descubre focos de basura en tu ciudad mediante un mapa interactivo
-- 📸 **Validación por IA**: Valida tu limpieza con fotos procesadas por inteligencia artificial
-- 💰 **Micropagos Instantáneos**: Recibe USDC/XLM sin mínimos ni comisiones bancarias
-- 🏆 **Gamificación**: Compite en ligas locales y nacionales, sube de nivel
-- 🎫 **Certificados NFT**: Cada acción genera un certificado de impacto ambiental inmutable
-- 🔍 **Transparencia Total**: Contratos inteligentes públicos y auditables en Stellar
-- 🌱 **Impacto Real**: Datos geolocalizados para políticas públicas ambientales
+</div>
 
-## Stack Tecnológico
+## Table of Contents
 
-- ⚡️ **Frontend**: Vite + React + TypeScript
-- 🔗 **Blockchain**: Stellar (Soroban Smart Contracts)
-- 🧠 **IA**: TensorFlow/PyTorch para validación visual
-- 🗺 **Maps**: Mapbox API
-- 💎 **Assets**: XLM (gas), USDC (rewards), NFTs (certificates)
-- 📦 **Storage**: IPFS (proofs & metadata)
+- [Overview](#overview)
+- [Core Features](#core-features)
+- [How It Works](#how-it-works)
+- [Technology Stack](#technology-stack)
+- [Quick Start](#quick-start)
+- [Smart Contracts](#smart-contracts-testnet)
+- [Architecture](#architecture)
+- [Real-World Impact](#real-world-impact)
+- [Roadmap](#roadmap)
+- [API Documentation](#api-documentation)
+- [Contributing](#contributing)
+- [License](#license)
 
-Built with [Stellar Scaffold](https://github.com/stellar-scaffold/cli).
+---
 
-## Requirements
+## Overview
 
-Before getting started, make sure you’ve met the requirements listed in the
-[Soroban documentation](https://developers.stellar.org/docs/build/smart-contracts/getting-started/setup)
-and that the following tools are installed :
+EcoBonus is **Latin America's first Clean-to-Earn platform** that democratizes urban ecology by transforming civic cleaning actions into blockchain-verified Real World Assets (RWAs). Built on Stellar, EcoBonus enables any Peruvian citizen to become an "opportunity collector"—turning spare minutes into verified environmental impact and real rewards.
 
-- [Rust](https://www.rust-lang.org/tools/install)
-- [Cargo](https://doc.rust-lang.org/cargo/) (comes with Rust)
-- Rust target: install the compilation target listed in the
-  [Soroban setup guide](https://developers.stellar.org/docs/build/smart-contracts/getting-started/setup)
-- [Node.js](https://nodejs.org/en/download/package-manager) (v22, or higher)
-- [npm](https://www.npmjs.com/): Comes with the node installer or can also be
-  installed package managers such as Homebrew, Chocolatey, apt, etc.
-- [Stellar CLI](https://github.com/stellar/stellar-core)
-- [Stellar Scaffold CLI Plugin](https://github.com/stellar-scaffold/cli)
+### The Problem
+
+Urban cleaning has traditionally been limited to municipal services and professional waste collectors. Citizens who want to contribute face:
+- No incentive structure for voluntary cleanup efforts
+- Lack of verification for individual environmental impact
+- No transparency on how cleanup efforts translate to measurable outcomes
+- Limited access to rewards due to bank account requirements and minimum thresholds
+
+**EcoBonus solves this** by creating a gamified Clean-to-Earn economy where every cleanup action becomes an auditable on-chain asset, rewarded with instant stablecoin micropayments.
+
+---
+
+## Core Features
+
+EcoBonus provides a comprehensive ecosystem for democratized urban cleaning through blockchain technology:
+
+### Geolocalized Missions 🌍
+Discover active waste hotspots on an interactive map. Citizens can claim cleanup missions near their daily routes—at the market, on the way to school, or during neighborhood walks. Each mission is geotagged and time-bounded.
+
+### AI-Powered Validation 📸
+Submit before/after photos processed by computer vision AI. Automated validation checks for waste presence, cleanup effectiveness, and geolocation consistency. Human validators provide final approval for complex cases.
+
+### Instant Micropayments 💰
+Receive USDC/XLM rewards directly to your wallet without bank accounts, minimum thresholds, or intermediary fees. Powered by Stellar's low-cost transaction infrastructure (<$0.01 per payment).
+
+### Gamification & Leagues 🏆
+Compete in local and national leaderboards. Earn experience points (XP), level up from "Urban Helper" to "Eco Guardian," and unlock exclusive rewards and recognition.
+
+### Environmental Impact NFTs 🎫
+Every validated cleanup mints an immutable certificate NFT containing:
+- Geolocation coordinates
+- Waste type and weight estimates
+- Carbon offset calculations
+- Before/after photo IPFS hashes
+- Timestamp and validator signatures
+
+### Full Transparency 🔍
+All smart contracts, transactions, and environmental data are publicly auditable on Stellar blockchain. Ministerio del Ambiente can verify aggregate impact metrics in real-time.
+
+### Public Policy Integration 🌱
+Geolocated cleanup data feeds directly into urban planning tools. City governments gain actionable insights on waste hotspots, cleanup effectiveness, and citizen engagement patterns.
+
+### Freighter Wallet Integration 💳
+Optional blockchain mode: connect your Freighter wallet to submit on-chain transactions for reward redemptions and earn verifiable NFT certificates. Works seamlessly in demo mode (localStorage) or blockchain mode (Stellar testnet).
+
+---
+
+## How It Works
+
+EcoBonus implements a three-phase Clean-to-Earn protocol:
+
+### Phase 1: Mission Discovery
+
+```
+User opens map interface:
+  - Interactive Mapbox view centered on Lima, Peru
+  - Active waste hotspots displayed as mission markers
+  - Filters by waste category, distance, reward amount
+
+User claims mission:
+  - Geofence validation (must be within 100m)
+  - Mission reservation (15-minute claim window)
+  - Before-photo requirement (AI validates waste presence)
+```
+
+**Result**: Mission status changes to "active" and is reserved for the user.
+
+### Phase 2: Cleanup Execution
+
+```
+User performs cleanup:
+  - Collects waste from marked location
+  - Takes after-photo showing clean area
+  - Submits proof via mobile interface
+
+AI validation (optional):
+  - TensorFlow.js analyzes before/after comparison
+  - Detects waste removal effectiveness
+  - Verifies geolocation consistency
+```
+
+**Result**: Mission evidence is submitted for validator review.
+
+### Phase 3: Validation & Reward Distribution
+
+```
+Validator reviews submission:
+  - Checks photos and geolocation data
+  - Approves/rejects with feedback
+  - Signs validation on-chain (if blockchain mode enabled)
+
+Smart contract execution:
+  - Distributes reward from sponsor pool (USDC/XLM)
+  - Mints environmental impact NFT certificate
+  - Updates leaderboards and user XP
+  - Records on-chain proof for transparency
+```
+
+**Result**: User receives instant payment and NFT certificate. Cleanup data is permanently recorded on Stellar blockchain.
+
+### Blockchain Integration
+
+**Demo Mode** (default):
+- Uses browser localStorage
+- No wallet required
+- Works completely offline
+- Simulated rewards and certificates
+
+**Blockchain Mode** (optional):
+- Connects Freighter wallet
+- Submits real Stellar transactions
+- Mints on-chain NFT certificates
+- Transfers USDC/XLM rewards from sponsor pools
+
+**Graceful Fallback**: Even with wallet connected, if blockchain transaction fails, the app falls back to demo mode to ensure user experience continuity.
+
+---
+
+## Technology Stack
+
+### Blockchain Infrastructure
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Layer 1** | Bitcoin | Final settlement and security anchor |
+| **Layer 2** | Stellar (Soroban) | Smart contract execution layer |
+| **Smart Contracts** | Rust (Soroban SDK) | Mission, Reward, Certificate NFT contracts |
+| **Token Standards** | Stellar Asset Contract | USDC, XLM, custom reward tokens |
+| **Wallet Integration** | Freighter Wallet | Transaction signing and identity |
+
+### Application Stack
+
+| Layer | Technology | Version | Function |
+|-------|------------|---------|----------|
+| **Frontend Framework** | React | 18.x | Component-based UI |
+| **Build System** | Vite | 5.x | Fast development builds |
+| **Styling** | Custom CSS | - | Utility-first responsive design |
+| **Maps** | Mapbox GL JS | 3.x | Interactive geolocation UI |
+| **Blockchain SDK** | @stellar/stellar-sdk | 14.x | Transaction building and signing |
+| **Wallet SDK** | @stellar/freighter-api | Latest | Freighter wallet integration |
+| **State Management** | Zustand | 5.x | Lightweight React state |
+| **Routing** | React Router | 6.x | SPA navigation |
+
+### Smart Contract Layer
+
+| Contract | Language | Purpose | Lines of Code |
+|----------|----------|---------|---------------|
+| **Mission Contract** | Rust (Soroban) | Mission creation, claiming, validation | ~500 LOC |
+| **Reward Contract** | Rust (Soroban) | Sponsor pools, claim submission, distribution | ~400 LOC |
+| **Certificate NFT** | Rust (Soroban) | Environmental impact NFT minting and transfer | ~600 LOC |
+
+### Development Tools
+
+| Tool | Purpose |
+|------|---------|
+| **Stellar CLI** | Smart contract compilation and deployment |
+| **Stellar Scaffold** | Frontend template and contract bindings |
+| **Soroban RPC** | Blockchain interaction and transaction simulation |
+| **IPFS** | Decentralized storage for photos and metadata |
+
+---
 
 ## Quick Start
 
-To get started with a fresh Stellar Scaffold project, follow the steps below:
+### Prerequisites
 
-1. Initialize a new project:
+- **Node.js** v22+ ([Download](https://nodejs.org/))
+- **Freighter Wallet** (optional, for blockchain mode) ([Install](https://freighter.app/))
+- **Rust** (for contract development) ([Install](https://www.rust-lang.org/tools/install))
+- **Stellar CLI** (for deployment) ([Install](https://developers.stellar.org/docs/build/smart-contracts/getting-started/setup))
 
-```bash
-stellar scaffold init my-project
-cd my-project
-```
-
-2. Set up your development environment:
+### Installation
 
 ```bash
-# Copy and configure environment variables like network and STELLAR_SCAFFOLD_ENV
-cp .env.example .env
+# Clone the repository
+git clone https://github.com/carlos-israelj/EcoBonus.git
+cd EcoBonus
 
-# Install frontend dependencies
+# Install dependencies
 npm install
 ```
 
-Have a look at `environments.toml` for more fined-grained control.
-
-3. Start development environment:
+### Running the Application
 
 ```bash
+# Start frontend development server
+cd templates/react
 npm run dev
 ```
 
-Open the server URL in your web browser.
+**Access the application:**
+- Frontend: http://localhost:5173
 
-4. For testnet/mainnet deployment:
+### Environment Configuration
 
-When you are ready for testnet, you need to deploy your contract using
-`stellar registry`. Some commands to get you started.
+**Frontend** (`templates/react/.env`):
+```env
+# Stellar Network
+VITE_STELLAR_NETWORK=testnet
+VITE_RPC_URL=https://soroban-testnet.stellar.org
 
-```bash
-#  Note --source-account argument is omitted for clarity
+# Contract Addresses (Testnet)
+VITE_MISSION_CONTRACT=CBITQYMLPOOOHZ3EXYKQFKB7XMOOLXIWH5WKTU6DAKZAJ5WFR5SFKUZK
+VITE_REWARD_CONTRACT=CDCGUCOJX4MUXSBYNPARNORJUIP5ZNTZ6HZ3T2UZANLMCZC5OZSLFF4Y
+VITE_CERTIFICATE_CONTRACT=CBJP7PQSFR7QNNKL6M4BVIXHRSIBLTD37GQBYU3GPT7FKOPEFEHTEXXW
 
-# First publish your contract to the registry
-stellar registry publish
-
-# Then deploy an instance with constructor parameters
-stellar registry deploy \
-  --deployed-name my-contract \
-  --published-name my-contract \
-  -- \
-  --param1 value1
-
-# Can access the help docs with --help
-stellar registry deploy \
-  --deployed-name my-contract \
-  --published-name my-contract \
-  -- \
-  --help
-
-# Install the deployed contract locally
-stellar registry create-alias my-contract
+# Mapbox API (optional, for maps)
+VITE_MAPBOX_TOKEN=your_mapbox_token
 ```
 
-## Scaffold Initial Project Structure
+---
 
-When you run `stellar scaffold init`, it creates a frontend-focused project
-structure with example contracts:
+## Smart Contracts (Testnet)
 
+### Deployed Contracts
+
+| Contract | Address | Explorer |
+|----------|---------|----------|
+| **Mission Contract** | `CBITQYMLPOOOHZ3EXYKQFKB7XMOOLXIWH5WKTU6DAKZAJ5WFR5SFKUZK` | [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CBITQYMLPOOOHZ3EXYKQFKB7XMOOLXIWH5WKTU6DAKZAJ5WFR5SFKUZK) |
+| **Reward Contract** | `CDCGUCOJX4MUXSBYNPARNORJUIP5ZNTZ6HZ3T2UZANLMCZC5OZSLFF4Y` | [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CDCGUCOJX4MUXSBYNPARNORJUIP5ZNTZ6HZ3T2UZANLMCZC5OZSLFF4Y) |
+| **Certificate NFT** | `CBJP7PQSFR7QNNKL6M4BVIXHRSIBLTD37GQBYU3GPT7FKOPEFEHTEXXW` | [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CBJP7PQSFR7QNNKL6M4BVIXHRSIBLTD37GQBYU3GPT7FKOPEFEHTEXXW) |
+
+### Contract Overview
+
+**Mission Contract** (`mission_contract.rs`):
+- Create geolocalized cleanup missions with reward pools
+- Claim missions within geofence boundaries
+- Submit cleanup evidence with before/after photos
+- Fund missions with XLM/USDC from sponsors
+- Query active missions by location
+
+**Key Functions**:
+```rust
+pub fn create_mission(env: Env, sponsor: Address, location: Location, reward_amount: i128) -> u64
+pub fn claim_mission(env: Env, user: Address, mission_id: u64) -> Result<(), Error>
+pub fn fund_mission(env: Env, sponsor: Address, mission_id: u64, amount: i128) -> Result<(), Error>
+pub fn get_active_missions_near(env: Env, location: Location, radius_meters: u32) -> Vec<Mission>
 ```
-my-project/                      # Your initialized project
-├── contracts/                   # Example smart contracts
-├── packages/                    # Auto-generated TypeScript clients
-├── src/                         # Frontend React application
-│   ├── components/              # React components
-│   ├── contracts/               # Contract interaction helpers
-│   ├── debug/                   # Debugging contract explorer
-│   ├── hooks/                   # Custom React hooks
-│   ├── pages/                   # App Pages
-│   ├── App.tsx                  # Main application component
-│   └── main.tsx                 # Application entry point
-├── target/                      # Build artifacts and WASM files
-├── environments.toml            # Environment configurations
-├── package.json                 # Frontend dependencies
-└── .env                         # Local environment variables
+
+**Reward Contract** (`reward_contract.rs`):
+- Create sponsor reward pools with multi-asset support
+- Submit claims for completed missions
+- Validate claims with multi-signature approval
+- Distribute rewards automatically to users
+- Track pool balances and claim history
+
+**Key Functions**:
+```rust
+pub fn create_pool(env: Env, sponsor: Address, token: Address, initial_amount: i128) -> u64
+pub fn submit_claim(env: Env, user: Address, mission_id: u64, amount: i128, proof_uri: String) -> u64
+pub fn validate_claim(env: Env, validator: Address, claim_id: u64, approved: bool) -> Result<(), Error>
+pub fn distribute_reward(env: Env, claim_id: u64) -> Result<(), Error>
 ```
 
-This template provides a ready-to-use frontend application with example smart
-contracts and their TypeScript clients. You can use these as reference while
-building your own contracts and UI. The frontend is set up with Vite, React, and
-includes basic components for interacting with the contracts.
+**Certificate NFT Contract** (`certificate_nft.rs`):
+- Mint environmental impact certificates as NFTs
+- Store geolocation, waste type, weight, carbon offset
+- Transfer certificates between users
+- Query user's total environmental impact
+- Immutable on-chain proof for auditors
 
-## 🚀 Stellar Testnet Deployment
+**Key Functions**:
+```rust
+pub fn mint_certificate(env: Env, to: Address, mission_id: u64, metadata: CertificateMetadata) -> u64
+pub fn transfer(env: Env, from: Address, to: Address, token_id: u64) -> Result<(), Error>
+pub fn get_certificate(env: Env, token_id: u64) -> CertificateMetadata
+pub fn get_user_impact(env: Env, user: Address) -> ImpactSummary
+```
 
-### Live Demo
-🌐 **Frontend**: [https://carlos-israelj.github.io/EcoBonus/](https://carlos-israelj.github.io/EcoBonus/)
+### Testnet Statistics
 
-### Smart Contracts on Testnet
-
-#### 1. Mission Contract
-**Contract ID**: `CBITQYMLPOOOHZ3EXYKQFKB7XMOOLXIWH5WKTU6DAKZAJ5WFR5SFKUZK`
-
-Gestiona misiones de limpieza geolocalizadas con validación descentralizada.
-
-- 🔗 [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CBITQYMLPOOOHZ3EXYKQFKB7XMOOLXIWH5WKTU6DAKZAJ5WFR5SFKUZK)
-- 🔬 [View on Stellar Lab](https://lab.stellar.org/r/testnet/contract/CBITQYMLPOOOHZ3EXYKQFKB7XMOOLXIWH5WKTU6DAKZAJ5WFR5SFKUZK)
-- 📝 Deployment TX: [e1eff8a0c92421aeef4bf9421eb336bba054ac50a76f1f7db2247496cb1b39d1](https://stellar.expert/explorer/testnet/tx/e1eff8a0c92421aeef4bf9421eb336bba054ac50a76f1f7db2247496cb1b39d1)
-- ⚙️ Initialize TX: [9de8f591658da36e7c4f537d8bde0395b9beb339c05f830c0c565d07d03a2c81](https://stellar.expert/explorer/testnet/tx/9de8f591658da36e7c4f537d8bde0395b9beb339c05f830c0c565d07d03a2c81)
-
-**Functions**: `create_mission`, `claim_mission`, `fund_mission`, `get_active_missions_near`, `cancel_mission`
-
-#### 2. Reward Contract
-**Contract ID**: `CDCGUCOJX4MUXSBYNPARNORJUIP5ZNTZ6HZ3T2UZANLMCZC5OZSLFF4Y`
-
-Administra pools de recompensas patrocinadas y distribución automática.
-
-- 🔗 [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CDCGUCOJX4MUXSBYNPARNORJUIP5ZNTZ6HZ3T2UZANLMCZC5OZSLFF4Y)
-- 🔬 [View on Stellar Lab](https://lab.stellar.org/r/testnet/contract/CDCGUCOJX4MUXSBYNPARNORJUIP5ZNTZ6HZ3T2UZANLMCZC5OZSLFF4Y)
-- 📝 Deployment TX: [a089270efbd975db35c247240452e55584f84d7c03785071a80312aef0f79a30](https://stellar.expert/explorer/testnet/tx/a089270efbd975db35c247240452e55584f84d7c03785071a80312aef0f79a30)
-- ⚙️ Initialize TX: [b1578ec5b27d5a39f7bcfda2db6b3f10f262d7ef603cc7aa5c7a6b6e721f2e26](https://stellar.expert/explorer/testnet/tx/b1578ec5b27d5a39f7bcfda2db6b3f10f262d7ef603cc7aa5c7a6b6e721f2e26)
-- 💰 Create Pool TX: [a7e00b9d709e797893113c48dbafe0e193c7848aed1a964fd83cd85338fa4354](https://stellar.expert/explorer/testnet/tx/a7e00b9d709e797893113c48dbafe0e193c7848aed1a964fd83cd85338fa4354)
-
-**Functions**: `create_pool`, `fund_pool`, `distribute_reward`, `submit_claim`, `validate_claim`
-
-#### 3. Certificate NFT Contract
-**Contract ID**: `CBJP7PQSFR7QNNKL6M4BVIXHRSIBLTD37GQBYU3GPT7FKOPEFEHTEXXW`
-
-Emite certificados de impacto ambiental como NFTs inmutables.
-
-- 🔗 [View on Stellar Expert](https://stellar.expert/explorer/testnet/contract/CBJP7PQSFR7QNNKL6M4BVIXHRSIBLTD37GQBYU3GPT7FKOPEFEHTEXXW)
-- 🔬 [View on Stellar Lab](https://lab.stellar.org/r/testnet/contract/CBJP7PQSFR7QNNKL6M4BVIXHRSIBLTD37GQBYU3GPT7FKOPEFEHTEXXW)
-- 📝 Deployment TX: [27f5609d1ab0ede3c445a0d6cbb12807b6ae415223209b64671df1562cdaef05](https://stellar.expert/explorer/testnet/tx/27f5609d1ab0ede3c445a0d6cbb12807b6ae415223209b64671df1562cdaef05)
-- ⚙️ Initialize TX: [09430b51a709dd7563be4fde9edee0c1677d58f40b2448ccdf3113b39b55c68a](https://stellar.expert/explorer/testnet/tx/09430b51a709dd7563be4fde9edee0c1677d58f40b2448ccdf3113b39b55c68a)
-- 🎨 Add Minter TX: [1a85691675aca71c09decadc6bdbed53893d0276eb4b34ae753ef04b5f972a26](https://stellar.expert/explorer/testnet/tx/1a85691675aca71c09decadc6bdbed53893d0276eb4b34ae753ef04b5f972a26)
-
-**Functions**: `mint_certificate`, `transfer`, `burn`, `get_certificate`, `get_user_impact`
-
-### Testnet Admin Account
-- **Address**: `GDUGXNI3GIFJSIHVML4DRUFXBWVVJR2PXUIHR4VB7XDT3J7ZPWZKU32W`
-- 🔗 [View on Stellar Expert](https://stellar.expert/explorer/testnet/account/GDUGXNI3GIFJSIHVML4DRUFXBWVVJR2PXUIHR4VB7XDT3J7ZPWZKU32W)
-
-### Test Transactions Log (19 Transactions Total)
-
-#### Contract Deployment & Initialization (8 TXs)
-
-| # | Transaction Type | TX Hash | Status |
-|---|-----------------|---------|--------|
-| 1 | Deploy Mission Contract | [e1eff8a...](https://stellar.expert/explorer/testnet/tx/e1eff8a0c92421aeef4bf9421eb336bba054ac50a76f1f7db2247496cb1b39d1) | ✅ Success |
-| 2 | Deploy Reward Contract | [a089270...](https://stellar.expert/explorer/testnet/tx/a089270efbd975db35c247240452e55584f84d7c03785071a80312aef0f79a30) | ✅ Success |
-| 3 | Deploy Certificate NFT | [27f5609...](https://stellar.expert/explorer/testnet/tx/27f5609d1ab0ede3c445a0d6cbb12807b6ae415223209b64671df1562cdaef05) | ✅ Success |
-| 4 | Initialize Mission Contract | [9de8f59...](https://stellar.expert/explorer/testnet/tx/9de8f591658da36e7c4f537d8bde0395b9beb339c05f830c0c565d07d03a2c81) | ✅ Success |
-| 5 | Initialize Reward Contract | [b1578ec...](https://stellar.expert/explorer/testnet/tx/b1578ec5b27d5a39f7bcfda2db6b3f10f262d7ef603cc7aa5c7a6b6e721f2e26) | ✅ Success |
-| 6 | Create Reward Pool (10 XLM) | [a7e00b9...](https://stellar.expert/explorer/testnet/tx/a7e00b9d709e797893113c48dbafe0e193c7848aed1a964fd83cd85338fa4354) | ✅ Success |
-| 7 | Initialize Certificate NFT | [09430b5...](https://stellar.expert/explorer/testnet/tx/09430b51a709dd7563be4fde9edee0c1677d58f40b2448ccdf3113b39b55c68a) | ✅ Success |
-| 8 | Add Minter to NFT Contract | [1a85691...](https://stellar.expert/explorer/testnet/tx/1a85691675aca71c09decadc6bdbed53893d0276eb4b34ae753ef04b5f972a26) | ✅ Success |
-
-#### Reward Contract Test Transactions (11 TXs)
-
-| # | Transaction Type | TX Hash | Details |
-|---|-----------------|---------|---------|
-| 9 | Add Validator (test-user1) | [bd20a98...](https://stellar.expert/explorer/testnet/tx/bd20a980e505db8863e07d3279bf5bfd4ea9a3050c4a8a135625d1a9bd9e6727) | ✅ Added test-user1 as validator |
-| 10 | Add Validator (test-user2) | [f5c422f...](https://stellar.expert/explorer/testnet/tx/f5c422f001f372c80cbd6e4d9ed801eeb04fd22b899d76b68e9487dec3abcc9f) | ✅ Added test-user2 as validator |
-| 11 | Create Pool (test-user1) | [69ecd65...](https://stellar.expert/explorer/testnet/tx/69ecd65bddba4a973c6e0fc6aeb16b72b23e759b1ba0074dadcee5b4c2dbad77) | ✅ Created pool with 5 XLM |
-| 12 | Create Pool (test-user2) | [1173024...](https://stellar.expert/explorer/testnet/tx/1173024e00834574d3b523ad0b63649e706ce68e27ef733a981d022423e2e4da) | ✅ Created pool with 7.5 XLM |
-| 13 | Fund Pool (admin +20 XLM) | [67e0e18...](https://stellar.expert/explorer/testnet/tx/67e0e1865bb0e37effc45a2e5e810ecb6dde0736053a52edc3e9ff2745eda9b2) | ✅ Added 20 XLM to admin pool |
-| 14 | Check Validator Status | [8f03d81...](https://stellar.expert/explorer/testnet/tx/8f03d81cd6d96e1c75b70a0328905ddd473a93b39b4af50553b4611cd7cb7efb) | ✅ Verified test-user1 is validator |
-| 15 | Get Pool Info (admin) | [f0382b5...](https://stellar.expert/explorer/testnet/tx/f0382b5e0d2fbecd9d89ce42d3c66678e04956cecfa2d9788b101cf4e27ff24f) | ✅ Retrieved pool: 30 XLM total |
-| 16 | Submit Claim (user1) | [a4f18d3...](https://stellar.expert/explorer/testnet/tx/a4f18d32e2a30fe9eddb18516e670b1e0a2ecdbc8ac52e1916fac6cdffc84b5f) | ✅ Claim #1: 0.5 XLM for mission 101 |
-| 17 | Submit Claim (user2) | [de19388...](https://stellar.expert/explorer/testnet/tx/de19388792a0d13b8d7ee7ca7a857c0c133bc934420ecad0cfbcd367e7b4b0df) | ✅ Claim #2: 0.8 XLM for mission 102 |
-| 18 | Validate Claim #1 | [bf94bc7...](https://stellar.expert/explorer/testnet/tx/bf94bc7c280627010f3d46c29435fe2cec88876d8ae4a861643f4ab1338666d8) | ✅ Approved by validator |
-| 19 | Get Claim Info | [72e7aac...](https://stellar.expert/explorer/testnet/tx/72e7aacf8d361a4584565fe7f0ef84cb74c4a797b914d09fbcd3d9ff021a137c) | ✅ Status: Approved |
-
-#### Certificate NFT Test Transactions (9 TXs)
-
-| # | Transaction Type | TX Hash | Details |
-|---|-----------------|---------|---------|
-| 8 | Mint Certificate #1 | [0fe44e0...](https://stellar.expert/explorer/testnet/tx/0fe44e0bfbf11da72fb4b79df10c7556814119716f4a3e150d4360f2b561cb6f) | ✅ Plastic waste, 5kg, Parque Kennedy |
-| 9 | Mint Certificate #2 | [5ac7081...](https://stellar.expert/explorer/testnet/tx/5ac7081f49184954321b9148f4a4be42e39d20215fec461e643df1d7148f0334) | ✅ Organic waste, 8kg, Playa Makaha |
-| 10 | Mint Certificate #3 | [caf3061...](https://stellar.expert/explorer/testnet/tx/caf3061b57a7de0d822fbcbce2dc492c64343cbdb044f8eaafd67a06cb2f97eb) | ✅ Mixed waste, 12kg, Malecón Reserva |
-| 11 | Get Certificate #1 Info | [2236bec...](https://stellar.expert/explorer/testnet/tx/2236beca2713b9989edbb97f7c3d24df774051f367470fe4afdb81c57d4d836a) | ✅ Retrieved full NFT metadata |
-| 12 | Get Total Minted | [99086e3...](https://stellar.expert/explorer/testnet/tx/99086e333723390a8515843cafa1c428a0be8b822c43f1de0c2146fd31228e22) | ✅ Total: 5 certificates |
-| 13 | Transfer Certificate #1 | [098851a...](https://stellar.expert/explorer/testnet/tx/098851a4e784aac5c05530b8e7a9fd868a3951771b3b4067e319537a4679a3e2) | ✅ user1 → user2 |
-| 14 | Mint Certificate #4 | [064ac85...](https://stellar.expert/explorer/testnet/tx/064ac85d559a3a7449360ee583a9500bb4ca045c523180c2c6327c27b9f558df) | ✅ Plastic waste, 15kg, Óvalo Miraflores |
-| 15 | Mint Certificate #5 | [a9cd376...](https://stellar.expert/explorer/testnet/tx/a9cd3760062d3e9eaf1ce6f07c6f1142e840db5eef85d009e2226adec94b094d) | ✅ Mixed waste, 20kg, Arequipa Plaza |
-
-### Summary Statistics
-
-- **Total Transactions**: 19 on Stellar Testnet
+**Total Transactions**: 19 on Stellar Testnet
 - **Contracts Deployed**: 3 (Mission, Reward, Certificate NFT)
 - **Validators Registered**: 2
 - **Reward Pools Created**: 3 (Total: 42.5 XLM funded)
 - **Claims Submitted**: 2
 - **Claims Validated**: 1 (Approved)
 - **NFT Certificates Minted**: 5
-- **NFT Transfers**: 1
 - **Total Waste Tracked**: 60 kg (Plastic: 20kg, Organic: 8kg, Mixed: 32kg)
 - **Carbon Offset**: 29 units
+
+---
+
+## Architecture
+
+### System Overview
+
+```mermaid
+flowchart TB
+    subgraph Frontend["React Frontend (Vite)"]
+        UI["User Interface"]
+        Map["Mapbox GL JS Maps"]
+        Wallet["Freighter Wallet Integration"]
+        State["Zustand State Management"]
+    end
+
+    subgraph Blockchain["Stellar Blockchain (Testnet)"]
+        subgraph Contracts["Soroban Smart Contracts"]
+            MissionContract["Mission Contract<br/>(Rust)"]
+            RewardContract["Reward Contract<br/>(Rust)"]
+            CertificateNFT["Certificate NFT<br/>(Rust)"]
+        end
+        RPC["Soroban RPC Server"]
+    end
+
+    subgraph Storage["Decentralized Storage"]
+        IPFS["IPFS<br/>(Photos & Metadata)"]
+    end
+
+    subgraph External["External Services"]
+        Mapbox["Mapbox API<br/>(Geolocation)"]
+        AI["AI Validation<br/>(TensorFlow)"]
+    end
+
+    UI --> Map
+    UI --> Wallet
+    Wallet --> RPC
+    RPC --> MissionContract
+    RPC --> RewardContract
+    RPC --> CertificateNFT
+    UI --> IPFS
+    Map --> Mapbox
+    UI --> AI
+    State --> UI
+```
+
+### Data Flow
+
+**Deposit Flow** (Mission Creation):
+```
+1. Sponsor creates mission via UI
+2. Frontend builds transaction with mission parameters
+3. Freighter wallet signs transaction
+4. Soroban RPC submits to Mission Contract
+5. Mission created on-chain with reward pool
+6. UI updates with new mission marker on map
+```
+
+**Claim Flow** (Cleanup Submission):
+```
+1. User claims mission and performs cleanup
+2. User uploads before/after photos to IPFS
+3. Frontend submits claim to Reward Contract
+4. AI validator analyzes photos (optional)
+5. Human validator approves claim on-chain
+6. Reward Contract distributes payment
+7. Certificate NFT minted with cleanup metadata
+8. UI shows reward confirmation + NFT certificate
+```
+
+### Privacy & Security
+
+**User Privacy**:
+- Photos stored on IPFS with optional encryption
+- Personal data never stored on-chain
+- Only wallet addresses and cleanup coordinates are public
+
+**Smart Contract Security**:
+- Admin-only functions protected by role-based access control
+- Sponsor pool withdrawals require multi-signature approval
+- Claim validation requires validator signatures
+- Nullifier checks prevent double-claiming
+
+---
+
+## Real-World Impact
+
+### Environmental Metrics (Testnet)
+
+| Metric | Value |
+|--------|-------|
+| **Total Cleanups** | 5 verified missions |
+| **Waste Collected** | 60 kg total |
+| **Carbon Offset** | 29 CO₂ equivalents |
+| **Active Users** | 3 validators, 2 sponsors |
+| **Reward Pools** | 42.5 XLM funded |
+
+### Use Cases
+
+**Citizen Participation**
+- Students clean their school routes and earn study stipends
+- Market vendors clean their surroundings before opening
+- Neighbors coordinate weekend cleanup campaigns
+- Tourists contribute to cleaner tourist destinations
+
+**Corporate Sponsorship**
+- Local businesses fund cleanup pools for brand visibility
+- NGOs sponsor environmental campaigns with transparent fund tracking
+- Government programs incentivize community participation
+- Carbon offset buyers purchase verified environmental credits
+
+**Public Policy**
+- City planners identify waste hotspots for infrastructure investment
+- Environmental Ministry tracks national cleanup progress
+- Research institutions analyze citizen engagement patterns
+- UN SDG reporting with blockchain-verified data
+
+---
+
+## Roadmap
+
+### Phase 1: Foundation (Completed ✅)
+**Timeline**: Q4 2025 - Q1 2026
+
+**Smart Contract Deployment**
+- Mission, Reward, and Certificate NFT contracts on Stellar testnet
+- Multi-asset reward pool support (XLM, USDC)
+- Geolocated mission framework with claim validation
+- Environmental impact NFT minting and transfer
+
+**Frontend Application**
+- React-based UI with Mapbox integration
+- Freighter wallet connection (optional blockchain mode)
+- Demo mode with localStorage fallback
+- Responsive design for mobile and desktop
+
+**Current Status**: Deployed on testnet with 19 test transactions. Functional demo at [https://carlos-israelj.github.io/EcoBonus/](https://carlos-israelj.github.io/EcoBonus/)
+
+---
+
+### Phase 2: AI Validation & Mainnet (Q2-Q3 2026)
+
+**AI-Powered Validation**
+- TensorFlow.js integration for before/after photo analysis
+- Waste detection and classification (plastic, organic, mixed)
+- Geolocation consistency verification
+- Automated approval for high-confidence cleanups
+
+**Mainnet Deployment**
+- Security audit of smart contracts
+- Mainnet contract deployment with admin keys
+- Real USDC reward pools from corporate sponsors
+- Production-grade infrastructure (IPFS pinning, RPC nodes)
+
+**Mobile Application**
+- Native iOS/Android apps with camera integration
+- Push notifications for nearby missions
+- Offline mode with batch sync
+- Wallet integration (Freighter, Lobstr)
+
+---
+
+### Phase 3: Scale & Ecosystem (Q4 2026)
+
+**Geographic Expansion**
+- Launch in additional Peruvian cities (Arequipa, Cusco, Trujillo)
+- Localization for other Latin American countries
+- Regional leaderboards and competitions
+- Multi-language support (Spanish, Quechua, English)
+
+**Partner Integrations**
+- Municipality dashboards for waste management data
+- Corporate ESG reporting tools
+- Carbon credit marketplaces
+- Educational institution partnerships
+
+**Advanced Features**
+- Multi-player cleanup events
+- Team competitions and guild system
+- Seasonal challenges with bonus rewards
+- NFT marketplace for environmental certificates
+
+---
+
+## API Documentation
+
+### Soroban Contract Interfaces
+
+**Mission Contract** (`templates/react/src/eco/soroban.ts`):
+```typescript
+// Create a new cleanup mission
+async function createMission(
+  sponsorAddress: string,
+  location: { latitude: number; longitude: number },
+  rewardAmount: bigint,
+  signTransaction: (xdr: string) => Promise<string>
+): Promise<{ missionId: number; txHash: string }>
+
+// Claim an active mission
+async function claimMission(
+  userAddress: string,
+  missionId: number,
+  signTransaction: (xdr: string) => Promise<string>
+): Promise<{ txHash: string }>
+
+// Get active missions near location
+async function getActiveMissionsNear(
+  location: { latitude: number; longitude: number },
+  radiusMeters: number
+): Promise<Mission[]>
+```
+
+**Reward Contract**:
+```typescript
+// Submit a cleanup claim
+async function submitClaim(
+  userAddress: string,
+  sponsorAddress: string,
+  missionId: number,
+  amount: bigint,
+  proofUri: string,
+  signTransaction: (xdr: string) => Promise<string>
+): Promise<{ claimId: number; txHash: string }>
+
+// Get claim information
+async function getClaim(claimId: number): Promise<ClaimInfo>
+```
+
+**Certificate NFT Contract**:
+```typescript
+// Mint environmental impact certificate
+async function mintCertificate(
+  minterAddress: string,
+  ownerAddress: string,
+  missionId: number,
+  claimId: number,
+  location: { latitude: number; longitude: number; radius: number },
+  weightKg: number,
+  category: 'Plastic' | 'Organic' | 'Mixed',
+  proofUri: string,
+  carbonOffset: number,
+  signTransaction: (xdr: string) => Promise<string>
+): Promise<{ tokenId: number; txHash: string }>
+
+// Get certificate metadata
+async function getCertificate(tokenId: number): Promise<CertificateMetadata>
+
+// Get total minted certificates
+async function getTotalMinted(): Promise<number>
+```
+
+### Frontend State Management
+
+**Zustand Store** (`templates/react/src/eco/store.ts`):
+```typescript
+interface EcoState {
+  // Wallet state
+  walletAddress: string | null
+  blockchainEnabled: boolean
+
+  // Mission state
+  missions: Mission[]
+  spots: WasteSpot[]
+
+  // Reward state
+  rewards: Reward[]
+  vouchers: Voucher[]
+
+  // User state
+  profile: UserProfile
+  points: number
+  xp: number
+
+  // Actions
+  redeem: (id: string, signTx?: (xdr: string) => Promise<string>) => Promise<string>
+  reviewMission: (id: string, approve: boolean, reason?: string, signTx?: (xdr: string) => Promise<string>) => Promise<void>
+}
+```
+
+---
+
+## Project Structure
+
+```
+EcoBonus/
+├── contracts/                    # Soroban Smart Contracts (Rust)
+│   ├── mission_contract/         # Mission creation and claiming
+│   ├── reward_contract/          # Reward pools and distribution
+│   └── certificate_nft/          # Environmental impact NFTs
+│
+├── templates/react/              # React Frontend (Vite)
+│   ├── src/
+│   │   ├── eco/                  # Main application code
+│   │   │   ├── soroban.ts        # Soroban client for contracts
+│   │   │   ├── useWallet.ts      # Freighter wallet hook
+│   │   │   ├── WalletConnect.tsx # Wallet UI component
+│   │   │   ├── store.ts          # Zustand state management
+│   │   │   ├── Missions.tsx      # Mission discovery UI
+│   │   │   ├── Rewards.tsx       # Reward redemption UI
+│   │   │   ├── Profile.tsx       # User profile and NFTs
+│   │   │   └── Map.tsx           # Mapbox geolocation map
+│   │   ├── App.tsx               # Main app component
+│   │   └── main.tsx              # Entry point
+│   ├── public/
+│   │   ├── icons/                # App icons and logos
+│   │   └── images/               # Mission and reward images
+│   ├── package.json
+│   └── vite.config.ts
+│
+├── docs/                         # Documentation
+│   └── TESTNET_GUIDE.md          # Testnet deployment guide
+├── README.md                     # This file
+├── LICENSE                       # MIT License
+└── package.json                  # Workspace root
+```
+
+---
+
+## Contributing
+
+Contributions are welcome! EcoBonus is open-source and community-driven.
+
+### Development Workflow
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+### Contribution Guidelines
+
+- **Code Style**: Follow existing conventions (ESLint for TypeScript, Rust fmt)
+- **Testing**: Add tests for new smart contract functions
+- **Documentation**: Update README.md and inline comments
+- **Commits**: Use descriptive commit messages
+- **Security**: Report vulnerabilities privately via GitHub Security tab
+
+---
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## Team
+
+**Lead Developer**: Carlos Israel Jiménez
+**GitHub**: [@carlos-israelj](https://github.com/carlos-israelj)
+
+---
+
+## Acknowledgments
+
+EcoBonus builds upon foundational work from:
+
+- **Stellar Development Foundation** - Soroban smart contract platform
+- **Stellar Scaffold Team** - Frontend template and development tools
+- **Freighter Wallet** - Stellar wallet browser extension
+- **Mapbox** - Geolocation and mapping infrastructure
+
+---
+
+## Contact & Support
+
+**Technical Issues**: [GitHub Issues](https://github.com/carlos-israelj/EcoBonus/issues)
+**Development Discussion**: [GitHub Discussions](https://github.com/carlos-israelj/EcoBonus/discussions)
+
+---
+
+<div align="center">
+
+<img src="./templates/react/public/icons/logo.svg" alt="EcoBonus" width="60" height="60">
+
+**Built on Stellar · Powered by Soroban · Verified by Blockchain**
+
+---
+
+*Every cleanup action counts. EcoBonus makes it count on-chain.*
+
+**© 2026 EcoBonus** · Licensed under [MIT](./LICENSE)
+
+</div>
