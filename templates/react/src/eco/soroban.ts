@@ -5,7 +5,6 @@
 
 import {
   Contract,
-  Soroban,
   TransactionBuilder,
   Networks,
   BASE_FEE,
@@ -15,8 +14,9 @@ import {
   scValToNative,
 } from '@stellar/stellar-sdk'
 
-// Type alias for compatibility
-type SorobanRpc = typeof Soroban
+// Import Soroban namespace - compatible with both v14-15 and v16+
+import * as StellarSDK from '@stellar/stellar-sdk'
+const SorobanRpc = 'SorobanRpc' in StellarSDK ? (StellarSDK as any).SorobanRpc : (StellarSDK as any).Soroban
 
 // Testnet configuration
 const RPC_URL = 'https://soroban-testnet.stellar.org'
@@ -30,7 +30,7 @@ export const CONTRACT_IDS = {
 }
 
 // Initialize Soroban RPC server
-const server = new Soroban.Server(RPC_URL)
+const server = new SorobanRpc.Server(RPC_URL)
 
 // Contract instances
 export const contracts = {
@@ -64,7 +64,7 @@ async function buildTransaction(
     throw new Error(`Simulation failed: ${simulated.error}`)
   }
 
-  const prepared = Soroban.assembleTransaction(transaction, simulated)
+  const prepared = SorobanRpc.assembleTransaction(transaction, simulated)
   return prepared.build()
 }
 

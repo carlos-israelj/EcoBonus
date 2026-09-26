@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react'
-import freighter from '@stellar/freighter-api'
+import * as freighter from '@stellar/freighter-api'
 
 interface WalletState {
   isInstalled: boolean
@@ -26,28 +26,33 @@ export function useWallet() {
   // Check if Freighter is installed
   useEffect(() => {
     const checkInstalled = async () => {
-      const installedResult = await freighter.isConnected()
-      const installed = !('error' in installedResult) && installedResult.isConnected
-      setWallet(prev => ({ ...prev, isInstalled: installed }))
+      try {
+        const installedResult = await freighter.isConnected()
+        const installed = !('error' in installedResult) && installedResult.isConnected
+        setWallet(prev => ({ ...prev, isInstalled: installed }))
 
-      if (installed) {
-        // Check if already connected
-        const allowedResult = await freighter.isAllowed()
-        const allowed = !('error' in allowedResult) && allowedResult.isAllowed
-        if (allowed) {
-          try {
-            const keyResult = await freighter.getPublicKey()
-            if (!('error' in keyResult)) {
-              setWallet(prev => ({
-                ...prev,
-                isConnected: true,
-                publicKey: keyResult.publicKey,
-              }))
+        if (installed) {
+          // Check if already connected
+          const allowedResult = await freighter.isAllowed()
+          const allowed = !('error' in allowedResult) && allowedResult.isAllowed
+          if (allowed) {
+            try {
+              const addressResult = await freighter.getAddress()
+              if (!('error' in addressResult)) {
+                setWallet(prev => ({
+                  ...prev,
+                  isConnected: true,
+                  publicKey: addressResult.address,
+                }))
+              }
+            } catch (error) {
+              console.error('Failed to get address:', error)
             }
-          } catch (error) {
-            console.error('Failed to get public key:', error)
           }
         }
+      } catch (error) {
+        console.error('Failed to check Freighter:', error)
+        setWallet(prev => ({ ...prev, isInstalled: false }))
       }
     }
 
@@ -72,15 +77,15 @@ export function useWallet() {
         throw new Error(allowedResult.error)
       }
 
-      const keyResult = await freighter.getPublicKey()
-      if ('error' in keyResult) {
-        throw new Error(keyResult.error)
+      const addressResult = await freighter.getAddress()
+      if ('error' in addressResult) {
+        throw new Error(addressResult.error)
       }
 
       setWallet(prev => ({
         ...prev,
         isConnected: true,
-        publicKey: keyResult.publicKey,
+        publicKey: addressResult.address,
         connecting: false,
         error: null,
       }))
@@ -160,6 +165,10 @@ export function formatAddress(address: string | null): string {
  * Check if Freighter extension is installed
  */
 export async function isFreighterInstalled(): Promise<boolean> {
-  const result = await freighter.isConnected()
-  return !('error' in result) && result.isConnected
+  try {
+    const result = await freighter.isConnected()
+    return !('error' in result) && result.isConnected
+  } catch {
+    return false
+  }
 }
