@@ -24,7 +24,7 @@ createRoot(document.getElementById("root") as HTMLElement).render(
 		<NotificationProvider>
 			<QueryClientProvider client={queryClient}>
 				<WalletProvider>
-					<BrowserRouter>
+					<BrowserRouter basename="/EcoBonus">
 						<App />
 					</BrowserRouter>
 				</WalletProvider>
