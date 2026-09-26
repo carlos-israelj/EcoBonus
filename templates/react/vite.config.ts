@@ -21,6 +21,8 @@ export default defineConfig({
 			includeAssets: ["favicon.svg", "images/*.jpg"],
 			manifest: false,
 			workbox: {
+				// Increase maximum file size to 5MB to accommodate Stellar SDK bundle
+				maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
 				runtimeCaching: [{
 					urlPattern: /^https:\/\/basemaps\.cartocdn\.com\/.*/i,
 					handler: "CacheFirst",
