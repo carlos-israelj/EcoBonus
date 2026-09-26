@@ -432,19 +432,21 @@ fetch(url, {
 })
 ```
 
-### Endpoints Críticos
-| Endpoint | Método | Uso |
-|----------|--------|-----|
-| `/api/auth/privy` | POST | Verificar token Privy |
-| `/api/missions/nearby` | GET | Mapa de misiones |
-| `/api/missions/:id` | GET | Detalle de misión |
-| `/api/missions/:id/claim` | POST | Reclamar misión |
-| `/api/claims` | POST | Enviar evidencias |
-| `/api/claims/me` | GET | Historial de claims |
-| `/api/points/balance` | GET | Puntos del usuario |
-| `/api/leaderboard` | GET | Rankings |
-| `/api/vouchers/catalog` | GET | Productos canjeables |
-| `/api/vouchers/redeem` | POST | Canjear puntos |
+### Endpoints Críticos (TODOS DISPONIBLES ✅)
+| Endpoint | Método | Uso | Status |
+|----------|--------|-----|--------|
+| `/api/auth/privy` | POST | Verificar token Privy | ✅ |
+| `/api/missions/nearby` | GET | Mapa de misiones | ✅ |
+| `/api/missions/:id` | GET | Detalle de misión | ✅ |
+| `/api/missions/:id/claim` | POST | Reclamar misión | ✅ |
+| `/api/claims/:id/validate-photos` | POST | Validar ambas fotos | ✅ NEW |
+| `/api/claims/:id/upload-before` | POST | Subir foto ANTES | ✅ NEW |
+| `/api/claims/:id/upload-after` | POST | Subir foto DESPUÉS | ✅ NEW |
+| `/api/claims/me` | GET | Historial de claims | ✅ |
+| `/api/points/balance` | GET | Puntos del usuario | ✅ |
+| `/api/leaderboard` | GET | Rankings | ✅ |
+| `/api/vouchers/catalog` | GET | Productos canjeables | ✅ |
+| `/api/vouchers/redeem` | POST | Canjear puntos | ✅ |
 
 ---
 
@@ -518,9 +520,11 @@ templates/react/src/
 - [x] **Validator Dashboard API** - `/api/validator/*` operativo
 - [x] **Supabase Database** - 10 tablas desplegadas
 
+### ✅ Dependencias Backend COMPLETADAS
+- [x] **GPS Missions API** - `/api/missions/nearby` (Sprint 1 COMPLETADO)
+- [x] **Claims API with dual photos** - `/api/claims/:id/validate-photos`, `/api/claims/:id/upload-before`, `/api/claims/:id/upload-after` (Sprint 2 COMPLETADO)
+
 ### ❌ Dependencias Backend PENDIENTES
-- [ ] **GPS Missions API** - `/api/missions/nearby` (Sprint 1 actual)
-- [ ] **Claims API with dual photos** - `/api/claims` con validación GPS (Sprint 2)
 - [ ] **IPFS Metadata** - Upload de fotos a IPFS (Sprint 3)
 
 ### 🔔 IMPORTANTE para Frontend Team
@@ -531,12 +535,13 @@ templates/react/src/
 4. Leaderboard (rankings, mi posición, cercanos)
 
 **Pueden empezar a implementar**:
-- Screen 1: Login con Privy
-- Screen 5: Perfil (puntos, nivel, vouchers, leaderboard)
+- Screen 1: Login con Privy ✅
+- Screen 2: Mapa con misiones GPS ✅ (API disponible)
+- Screen 3: Detalle de misión ✅ (API disponible)
+- Screen 4: Captura de evidencias ✅ (3 endpoints disponibles)
+- Screen 5: Perfil (puntos, nivel, vouchers, leaderboard) ✅
 
-**Deben esperar para**:
-- Screen 2: Mapa (missions/nearby pendiente)
-- Screen 4: Captura fotos (claims pendiente)
+**Todas las pantallas principales tienen APIs disponibles**
 
 ### Coordinación con Backend Team
 - **Doc disponible**: `backend/IMPLEMENTATION_STATUS.md`
@@ -589,5 +594,6 @@ Este roadmap frontend está alineado con:
 ---
 
 **Aprobado por**: Equipo EcoBonus
-**Próxima Revisión**: 2026-10-01
-**Estado**: Sprint 0 en progreso
+**Última Actualización**: 2026-09-25
+**Próxima Revisión**: 2026-10-22
+**Estado**: Backend Sprints 1-2 completados - TODOS los endpoints core disponibles para frontend
