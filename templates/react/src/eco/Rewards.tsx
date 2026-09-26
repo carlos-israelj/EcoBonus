@@ -6,6 +6,8 @@ import { useEco } from './store'
 import { DemoNote, Empty, Modal, PageTitle, Points, useToast } from './ui'
 import { formatDate } from './data'
 import type { Reward } from './types'
+import { useWallet } from './useWallet'
+import { WalletBadge } from './WalletConnect'
 
 const icons = { Wheat, Droplets, NotebookPen, Coffee, BottleWine, Sprout }
 export function RewardArt({ reward }: { reward: Reward }) {
