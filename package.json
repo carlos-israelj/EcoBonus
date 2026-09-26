@@ -3,9 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "npm start",
-    "prestart": "node scripts/dev-guard.mjs",
-    "start": "npm start --workspace app",
+    "dev": "npm run dev --workspace templates/react -- --host 0.0.0.0",
+    "start": "npm run dev",
+    "build": "npm run build --workspace templates/react",
+    "preview": "npm run preview --workspace templates/react -- --host 0.0.0.0",
+    "test:frontend": "playwright test --config e2e/ecobonus.config.ts",
+    "lint:frontend": "npm run lint --workspace templates/react",
     "lint": "npm run lint --workspaces --if-present",
     "format": "prettier . --write",
     "format:check": "prettier . --check"

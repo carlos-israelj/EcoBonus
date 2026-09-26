@@ -1,0 +1,40 @@
+import type { Coordinates, Reward, Spot } from './types'
+
+export const DEMO_ORIGIN: Coordinates = [-77.033, -12.1195]
+export const AREQUIPA_ORIGIN: Coordinates = [-71.537, -16.399]
+export const AREQUIPA_TEST_POINTS: Array<{ name: string; coordinates: Coordinates; severity: 'high' | 'medium' | 'clean' }> = [
+  { name: 'Plaza de Armas', coordinates: [-71.5369, -16.3988], severity: 'high' },
+  { name: 'Vallecito', coordinates: [-71.5511, -16.4074], severity: 'medium' },
+  { name: 'Parque Selva Alegre', coordinates: [-71.5221, -16.3859], severity: 'clean' },
+]
+export const spots: Spot[] = [
+  { id: 'LM-MIR-0101', name: 'Parque Kennedy', district: 'Miraflores', zone: 'Parques', coordinates: [-77.0304, -12.1211], severity: 'medium', points: 40, minutes: 15, image: '/images/park.jpg', description: 'Ayudemos a recuperar el entorno del parque. Recoge botellas, envolturas y residuos ligeros de las áreas peatonales. Separa los materiales reciclables.', validator: 'Lucía · Embajadora ambiental', updated: 'Hace 25 min' },
+  { id: 'LM-MIR-0102', name: 'Playa Makaha', district: 'Miraflores', zone: 'Playas', coordinates: [-77.0379, -12.1274], severity: 'high', points: 80, minutes: 30, image: '/images/beach.jpg', description: 'Una playa más limpia empieza con pequeños pasos. Retira plásticos y residuos de la zona seca. Permanece lejos del oleaje y de los acantilados.', validator: 'Diego · Embajador ambiental', updated: 'Hace 40 min' },
+  { id: 'LM-MIR-0103', name: 'Malecón de la Reserva', district: 'Miraflores', zone: 'Parques', coordinates: [-77.0319, -12.1302], severity: 'medium', points: 50, minutes: 20, image: '/images/coast.jpg', description: 'Devuelve el verde al malecón recogiendo residuos de los senderos públicos. Usa guantes y deposita las bolsas en el punto de acopio.', validator: 'Lucía · Embajadora ambiental', updated: 'Hace 1 h' },
+  { id: 'LM-MIR-0104', name: 'Parque del Amor', district: 'Miraflores', zone: 'Parques', coordinates: [-77.0368, -12.1225], severity: 'clean', points: 30, minutes: 15, image: '/images/park.jpg', description: 'Esta zona ya fue recuperada por la comunidad. Explora otras misiones o reporta nuevos residuos si el lugar vuelve a necesitar ayuda.', validator: 'María · Embajadora ambiental', updated: 'Hace 2 h' },
+  { id: 'LM-MIR-0105', name: 'Óvalo de Miraflores', district: 'Miraflores', zone: 'Calles', coordinates: [-77.0291, -12.1175], severity: 'high', points: 60, minutes: 25, image: '/images/park.jpg', description: 'Recoge residuos ligeros en las veredas del óvalo. Respeta los cruces peatonales y no ingreses a la calzada.', validator: 'Diego · Embajador ambiental', updated: 'Hace 50 min' },
+  { id: 'LM-MIR-0106', name: 'Parque María Reiche', district: 'Miraflores', zone: 'Parques', coordinates: [-77.0486, -12.1135], severity: 'medium', points: 45, minutes: 20, image: '/images/park.jpg', description: 'Recupera los senderos del parque y clasifica los residuos reciclables. Una misión ideal para tu paseo por el malecón.', validator: 'María · Embajadora ambiental', updated: 'Hace 1 h' },
+  { id: 'LM-BAR-0201', name: 'Playa Los Yuyos', district: 'Barranco', zone: 'Playas', coordinates: [-77.0221, -12.1531], severity: 'high', points: 90, minutes: 35, image: '/images/beach.jpg', description: 'Limpieza de residuos ligeros en la playa. No manipules vidrios, agujas ni residuos peligrosos. Reporta esos materiales al validador.', validator: 'Diego · Embajador ambiental', updated: 'Hace 30 min' },
+  { id: 'LM-BAR-0202', name: 'Parque Municipal de Barranco', district: 'Barranco', zone: 'Parques', coordinates: [-77.0202, -12.1494], severity: 'medium', points: 40, minutes: 15, image: '/images/park.jpg', description: 'Un pequeño cambio para nuestro barrio. Recoge envolturas y botellas alrededor de las bancas y jardines.', validator: 'Lucía · Embajadora ambiental', updated: 'Hace 2 h' },
+  { id: 'LM-RIM-0412', name: 'Río Rímac · Puente del Ejército', district: 'Rímac', zone: 'Ríos', coordinates: [-77.0468, -12.0384], severity: 'high', points: 100, minutes: 40, image: '/images/coast.jpg', description: 'Intervención únicamente en la zona peatonal habilitada. No bajes a la ribera ni entres al agua. Coordina con el embajador antes de comenzar.', validator: 'Carlos · Embajador ambiental', updated: 'Hace 2 h' },
+  { id: 'LM-RIM-0413', name: 'Alameda de los Descalzos', district: 'Rímac', zone: 'Parques', coordinates: [-77.0268, -12.0345], severity: 'medium', points: 50, minutes: 20, image: '/images/park.jpg', description: 'Ayuda a mantener limpia la alameda. Solo residuos ligeros y no peligrosos en espacios de acceso público.', validator: 'Carlos · Embajador ambiental', updated: 'Hace 1 h' },
+  { id: 'LM-SIS-0301', name: 'Bosque El Olivar', district: 'San Isidro', zone: 'Parques', coordinates: [-77.0341, -12.0972], severity: 'clean', points: 40, minutes: 20, image: '/images/park.jpg', description: 'La comunidad ha recuperado este espacio. Cuidemos juntos sus árboles y senderos.', validator: 'María · Embajadora ambiental', updated: 'Hace 3 h' },
+  { id: 'LM-SIS-0302', name: 'Parque Alfonso Ugarte', district: 'San Isidro', zone: 'Parques', coordinates: [-77.0458, -12.0955], severity: 'medium', points: 35, minutes: 15, image: '/images/park.jpg', description: 'Recoge envolturas y botellas de las áreas de tránsito del parque, sin intervenir los jardines.', validator: 'María · Embajadora ambiental', updated: 'Hace 45 min' },
+]
+export const rewards: Reward[] = [
+  { id: 'rice', title: 'Arroz para tu hogar', description: 'Una bolsa de arroz de 1 kg. Un pequeño aporte a tu mesa por un gran aporte a tu ciudad.', cost: 250, stock: 24, category: 'Alimentos', icon: 'Wheat', color: '#f4ecd7', sponsor: 'Bodega Verde · demo', location: 'Punto de entrega demo · Miraflores' },
+  { id: 'oil', title: 'Aceite vegetal', description: 'Botella de aceite vegetal de 1 litro para compartir en casa.', cost: 300, stock: 18, category: 'Alimentos', icon: 'Droplets', color: '#f7edc8', sponsor: 'Bodega Verde · demo', location: 'Punto de entrega demo · Miraflores' },
+  { id: 'kit', title: 'Un nuevo comienzo', description: 'Kit de útiles: cuaderno, lápices y borrador para tus próximas ideas.', cost: 180, stock: 30, category: 'Accesorios', icon: 'NotebookPen', color: '#e5e7f7', sponsor: 'Campus Circular · demo', location: 'Punto de entrega demo · San Isidro' },
+  { id: 'coffee', title: 'Tu pausa favorita', description: 'Un café americano y un momento para celebrar lo que hiciste por Lima.', cost: 120, stock: 40, category: 'Experiencias', icon: 'Coffee', color: '#ebdfd2', sponsor: 'Café de Barrio · demo', location: 'Punto de entrega demo · Barranco' },
+  { id: 'bottle', title: 'Menos plástico, más vida', description: 'Botella reutilizable de 500 ml para acompañarte en cada misión.', cost: 400, stock: 12, category: 'Accesorios', icon: 'BottleWine', color: '#dceee7', sponsor: 'Reusa Perú · demo', location: 'Punto de entrega demo · Miraflores' },
+  { id: 'plant', title: 'Llévate un poco de verde', description: 'Una pequeña planta de vivero para seguir cultivando el cambio.', cost: 200, stock: 16, category: 'Experiencias', icon: 'Sprout', color: '#e7efd5', sponsor: 'Raíces · demo', location: 'Punto de entrega demo · Miraflores' },
+]
+export const districts = ['Miraflores', 'Barranco', 'San Isidro', 'Rímac', 'Lima Cercado']
+export const severityLabels = { high: 'Prioridad alta', medium: 'Prioridad media', clean: 'Zona recuperada' }
+export const formatDate = (value: string) => new Intl.DateTimeFormat('es-PE', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(new Date(value))
+export function distance(a: Coordinates, b: Coordinates) {
+  const rad = Math.PI / 180
+  const p = Math.sin((b[1] - a[1]) * rad / 2) ** 2 + Math.cos(a[1] * rad) * Math.cos(b[1] * rad) * Math.sin((b[0] - a[0]) * rad / 2) ** 2
+  return 6371000 * 2 * Math.atan2(Math.sqrt(p), Math.sqrt(1 - p))
+}
+export const formatDistance = (meters: number) => meters < 1000 ? `${Math.round(meters / 10) * 10} m` : `${(meters / 1000).toFixed(1)} km`

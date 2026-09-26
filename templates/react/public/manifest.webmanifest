@@ -1,0 +1,12 @@
+{
+  "name": "EcoBonus · Lima",
+  "short_name": "EcoBonus",
+  "description": "Clean-to-earn para una Lima más verde",
+  "lang": "es-PE",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f5f8f6",
+  "theme_color": "#0e4b4f",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
