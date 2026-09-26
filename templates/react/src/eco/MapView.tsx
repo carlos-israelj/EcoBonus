@@ -11,8 +11,11 @@ const cartoStyle: StyleSpecification = {
   sources: { carto: { type: 'raster', tiles: ['https://basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'], tileSize: 256, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>', maxzoom: 19 } },
   layers: [{ id: 'background', type: 'background', paint: { 'background-color': '#eaf0e7' } }, { id: 'carto', type: 'raster', source: 'carto', paint: { 'raster-saturation': -0.25, 'raster-contrast': 0.02 } }],
 }
+const basemapsKey = (import.meta.env.PUBLIC_BASEMAPS_API_KEY || import.meta.env.VITE_BASEMAPS_API_KEY) as string | undefined
 const maptilerKey = (import.meta.env.PUBLIC_MAPTILER_KEY || import.meta.env.VITE_MAPTILER_KEY) as string | undefined
-const mapStyle: StyleSpecification | string = maptilerKey
+const mapStyle: StyleSpecification | string = basemapsKey
+  ? `https://api.maptiler.com/maps/streets-v2/style.json?key=${encodeURIComponent(basemapsKey)}`
+  : maptilerKey
   ? `https://api.maptiler.com/maps/streets-v2/style.json?key=${encodeURIComponent(maptilerKey)}`
   : cartoStyle
 maplibregl.setWorkerUrl('https://unpkg.com/maplibre-gl@6.11.2/dist/maplibre-gl-worker.mjs')
