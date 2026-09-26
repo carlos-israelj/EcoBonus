@@ -356,12 +356,12 @@ GET    /api/analytics/impact            # Tons removed, bags collected
 
 ---
 
-### Sprint 1: Missions & Map (Oct 8-14) 🔥 **SPRINT ACTUAL**
+### Sprint 1: Missions & Map (Oct 8-14) ✅ **COMPLETADO**
 
 **Prioridad**: ALTA (Core Feature bloqueando frontend)
 
 **SQL Function (PostGIS)**:
-- [ ] Agregar a `supabase-schema.sql`:
+- [x] Agregado a `create-function-only.sql`:
 ```sql
 CREATE OR REPLACE FUNCTION missions_nearby(
   user_lat FLOAT,
@@ -397,76 +397,65 @@ $$ LANGUAGE plpgsql;
 ```
 
 **Backend Service**:
-- [ ] Implementar en `src/controllers/mission.controller.js`:
+- [x] Implementado en `src/controllers/mission.controller.js`:
   - `getNearbyMissions(req, res)` - llama a `missions_nearby()`
   - `getMissionById(req, res)` - retorna detalle completo
   - `generateMissionCode(zoneType, sequence)` → LM-RIM-0412
 
 **API Endpoints**:
-- [ ] `GET /api/missions/nearby?lat=-12.118893&lng=-77.029572&radius=5000`
-- [ ] `GET /api/missions/:id`
-- [ ] `POST /api/missions` (admin/validator only)
+- [x] `GET /api/missions/nearby?lat=-12.118893&lng=-77.029572&radius=5000`
+- [x] `GET /api/missions/:id`
+- [x] `POST /api/missions` (admin/validator only)
 
-**Deliverables**:
-- SQL function desplegada en Supabase
-- Missions API con geo-search
-- Testing con coordenadas de Lima/CDMX
+**Deliverables**: ✅ COMPLETADO
+- [x] SQL function desplegada en Supabase
+- [x] Missions API con geo-search
+- [x] Testing completo (test-complete-gps-flow.js)
+- [x] 459m distance precision verified
+- [x] Multiple radius tests passing
 
 ---
 
-### Sprint 2: Before/After Photos + EXIF GPS (Oct 15-21)
+### Sprint 2: Before/After Photos + EXIF GPS (Oct 15-21) ✅ **COMPLETADO**
 
 **Prioridad**: ALTA (Core Feature)
 
 **Dependencies**:
-- [ ] `npm install exif-parser sharp`
+- [x] `npm install exif-parser sharp imghash multer`
 
-**Photo Validation Utility**:
-- [ ] Crear `src/utils/photoValidator.js`:
-```javascript
-import ExifParser from 'exif-parser';
+**Photo Validation Service**:
+- [x] Creado `src/services/photoValidation.service.js`:
+  - `extractGPSFromPhoto(photoBuffer)` - EXIF GPS extraction
+  - `validatePhotoLocation(photoGPS, missionGPS)` - location validation with Haversine formula
+  - `calculatePhotoHash(photoBuffer)` - perceptual hashing with imghash
+  - `comparePhotoHashes(hash1, hash2)` - duplicate detection with Hamming distance
+  - `validateBeforeAfterPhotos(beforePhoto, afterPhoto, mission)` - complete workflow
+  - `getImageMetadata(photoBuffer)` - dimensions, format, size
 
-export async function validatePhotoGPS(photoBuffer, expectedLat, expectedLon, maxDistance = 100) {
-  const parser = ExifParser.create(photoBuffer);
-  const result = parser.parse();
+**Claims Controller**:
+- [x] Updated `src/controllers/claim.controller.js`:
+  - `validatePhotos(req, res)` - validate both photos together
+  - `uploadBeforePhoto(req, res)` - upload before photo with GPS validation
+  - `uploadAfterPhoto(req, res)` - upload after photo and compare with before
 
-  const photoLat = result.tags.GPSLatitude;
-  const photoLon = result.tags.GPSLongitude;
-  const timestamp = result.tags.DateTimeOriginal;
-
-  const distance = calculateDistance(photoLat, photoLon, expectedLat, expectedLon);
-
-  if (distance > maxDistance) {
-    throw new Error(`Photo taken ${distance}m away from mission`);
-  }
-
-  return { lat: photoLat, lon: photoLon, timestamp };
-}
-
-export function validatePhotoSequence(beforeTimestamp, afterTimestamp) {
-  if (new Date(afterTimestamp) <= new Date(beforeTimestamp)) {
-    throw new Error('After photo must be taken AFTER before photo');
-  }
-}
-```
-
-**Claims Service**:
-- [ ] Update `src/services/claims.service.js`:
-  - `validateBeforeAfterPhotos(beforeBuffer, afterBuffer, missionGPS)`
-  - `generatePerceptualHash(photoBuffer)` - usando `sharp`
-  - `checkDuplicatePhoto(pHash)` - query Supabase
+**Upload Middleware**:
+- [x] Created `src/middleware/upload.js`:
+  - Multer configuration (memory storage)
+  - File type validation (images only)
+  - File size limit (10MB)
+  - Error handling for upload failures
 
 **API Endpoints**:
-- [ ] Update `POST /api/claims`:
-  - Validar EXIF GPS de ambas fotos
-  - Validar timestamps (before < after)
-  - Validar distancia a misión (max 100m)
-  - Generar pHash anti-duplicados
+- [x] `POST /api/claims/:id/validate-photos` - validate both before + after photos
+- [x] `POST /api/claims/:id/upload-before` - upload before photo with GPS validation
+- [x] `POST /api/claims/:id/upload-after` - upload after photo and check for duplicates
 
-**Deliverables**:
-- Validación dual de fotos con GPS
-- Detección de duplicados
-- Rechazo automático si GPS inválido
+**Deliverables**: ✅ COMPLETADO
+- [x] Validación dual de fotos con GPS (EXIF metadata extraction)
+- [x] Detección de duplicados (perceptual hashing + Hamming distance)
+- [x] Scoring system (0-100 points: location 80pts + difference 20pts + GPS bonus 20pts)
+- [x] IPFS integration ready (automatic upload on validation)
+- [x] Complete validation workflow with detailed results
 
 ---
 
@@ -761,5 +750,6 @@ Cada sprint se considera completo cuando:
 
 ---
 
-**Última Actualización**: 2026-09-24
-**Próxima Sync**: 2026-10-01
+**Última Actualización**: 2026-09-25
+**Próxima Sync**: 2026-10-22
+**Estado Actual**: Sprint 1-2 completados, Sprint 3 (AI Validation) próximo

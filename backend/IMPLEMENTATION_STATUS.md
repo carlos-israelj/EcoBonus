@@ -110,97 +110,56 @@ Usuario canjea vouchers QR
 
 ---
 
-## Features Pendientes (de la documentación compartida) ❌
+## Features Completadas Recientemente ✅
 
-### 1. Misiones con GPS Validation
-- **Status:** ❌ NO implementado
-- **Requiere:**
-  - Endpoint: `GET /api/missions/nearby?lat=X&lon=Y&radius=5000`
-  - PostGIS extension (YA está en schema SQL ✅)
-  - Trigger de distancia GPS (YA está en schema SQL ✅)
-  - Frontend que capture coordenadas del usuario
+### 1. Misiones con GPS Validation ✅ COMPLETADO (Sprint 1)
+- **Status:** ✅ COMPLETADO
+- **Implementado:**
+  - Endpoint: `GET /api/missions/nearby?lat=X&lon=Y&radius=5000` ✅
+  - PostGIS extension habilitada ✅
+  - SQL function `missions_nearby()` desplegada ✅
+  - Testing completo (459m precision) ✅
 
-**Código necesario:**
-```javascript
-// src/controllers/mission.controller.js
-export async function getNearbyMissions(req, res) {
-  const { lat, lon, radius = 5000 } = req.query;
+**Archivos implementados:**
+- `backend/create-function-only.sql` - SQL function con PostGIS
+- `backend/src/controllers/mission.controller.js` - endpoint getNearbyMissions()
+- `backend/test-complete-gps-flow.js` - testing suite completo
+- `backend/execute-sql-function.js` - verification script
 
-  const { data, error } = await supabase.rpc('missions_nearby', {
-    user_lat: parseFloat(lat),
-    user_lon: parseFloat(lon),
-    radius_meters: parseInt(radius)
-  });
-
-  res.json({ success: true, missions: data });
-}
+**Test results:**
+```
+✅ TEST 1: Function exists and working (459m distance)
+✅ TEST 2: Mission creation (LM-MFLOR-0001)
+✅ TEST 3: Supabase RPC with multiple radius tests
+  ✅ User cerca (461m) → Found 1 mission (459m)
+  ✅ User muy cerca (100m radius) → Found 0 missions
+  ✅ User en ubicación exacta → Found 1 mission (0m)
+  ✅ User lejos (5km) → Found 0 missions
 ```
 
-**SQL function (FALTA en schema):**
-```sql
-CREATE OR REPLACE FUNCTION missions_nearby(
-  user_lat FLOAT,
-  user_lon FLOAT,
-  radius_meters INT DEFAULT 5000
-)
-RETURNS TABLE (
-  id UUID,
-  title TEXT,
-  description TEXT,
-  points_reward INTEGER,
-  distance_meters INTEGER
-) AS $$
-BEGIN
-  RETURN QUERY
-  SELECT
-    m.id,
-    m.title,
-    m.description,
-    m.points_reward,
-    ST_Distance(
-      ST_MakePoint(user_lon, user_lat)::geography,
-      ST_MakePoint(m.longitude, m.latitude)::geography
-    )::INTEGER as distance_meters
-  FROM missions m
-  WHERE m.status = 'active'
-    AND ST_DWithin(
-      ST_MakePoint(m.longitude, m.latitude)::geography,
-      ST_MakePoint(user_lon, user_lat)::geography,
-      radius_meters
-    )
-  ORDER BY distance_meters ASC;
-END;
-$$ LANGUAGE plpgsql;
-```
+### 2. Before/After Photos con Coordenadas ✅ COMPLETADO (Sprint 2)
+- **Status:** ✅ COMPLETADO
+- **Implementado:**
+  - EXIF GPS extraction (latitud, longitud, timestamp)
+  - Comparación de coordenadas con ubicación de misión (Haversine formula)
+  - Validación de timestamp (before < after)
+  - Perceptual hashing para detectar duplicados
+  - Sistema de scoring (0-100 puntos)
+  - 3 nuevos endpoints
 
-### 2. Before/After Photos con Coordenadas
-- **Status:** ❌ Parcialmente implementado
-- **Lo que falta:**
-  - Validar que fotos tengan coordenadas GPS embedded
-  - Comparar coordenadas de before/after con ubicación de misión
-  - Validar timestamp (before debe ser antes que after)
+**Archivos implementados:**
+- `backend/src/services/photoValidation.service.js` - servicio completo
+- `backend/src/controllers/claim.controller.js` - 3 nuevos métodos
+- `backend/src/middleware/upload.js` - Multer configuration
+- `backend/src/routes/index.js` - 3 nuevas rutas
 
-**Código necesario:**
-```javascript
-// src/services/claim.service.js
-import ExifParser from 'exif-parser';
-
-async function validatePhotoGPS(photoBuffer, expectedLat, expectedLon, maxDistance = 100) {
-  const parser = ExifParser.create(photoBuffer);
-  const result = parser.parse();
-
-  const photoLat = result.tags.GPSLatitude;
-  const photoLon = result.tags.GPSLongitude;
-
-  const distance = calculateDistance(photoLat, photoLon, expectedLat, expectedLon);
-
-  if (distance > maxDistance) {
-    throw new Error(`Photo taken ${distance}m away from mission location`);
-  }
-
-  return { lat: photoLat, lon: photoLon, timestamp: result.tags.DateTimeOriginal };
-}
-```
+**Características:**
+- GPS extraction con aplicación de hemisferio (N/S, E/W)
+- Distance calculation con fórmula Haversine (precision métrica)
+- Perceptual hashing con imghash (16-bit hash)
+- Hamming distance para comparación (>90% = similar, >98% = identical)
+- Scoring: location valid (80pts) + photos different (20pts) + GPS present (20pts bonus)
+- Automatic IPFS upload integration ready
 
 ### 3. IPFS Metadata para RWA Certificates
 - **Status:** ❌ NO implementado
@@ -384,12 +343,12 @@ export async function mintImpactCertificate(userId, stellarAddress, impactData, 
 
 ## Resumen de Prioridades
 
-### Alta Prioridad (Core Features)
+### Alta Prioridad (Core Features) - COMPLETADO ✅
 1. ✅ Autenticación dual (Privy + Stellar)
 2. ✅ Sistema de puntos
 3. ✅ Vouchers QR
-4. ❌ **GPS-based mission discovery** → IMPLEMENTAR PRÓXIMO
-5. ❌ **Before/After photo validation** → IMPLEMENTAR PRÓXIMO
+4. ✅ **GPS-based mission discovery** (Sprint 1)
+5. ✅ **Before/After photo validation** (Sprint 2)
 
 ### Media Prioridad (Blockchain Features)
 6. ❌ IPFS metadata upload
@@ -405,24 +364,31 @@ export async function mintImpactCertificate(userId, stellarAddress, impactData, 
 
 ## Next Steps
 
-### Sprint Actual: GPS Missions + Photo Validation
+### ✅ Sprints Completados
+- ✅ Sprint 0: Setup (Supabase + Privy + Points + Vouchers + Leaderboard)
+- ✅ Sprint 1: GPS Missions (PostGIS + API + Testing)
+- ✅ Sprint 2: Photo Validation (EXIF GPS + Perceptual Hash + Endpoints)
 
-1. **Agregar función SQL para misiones cercanas**
-   - Editar: `supabase-schema.sql`
-   - Agregar: `CREATE FUNCTION missions_nearby(...)`
+### 🚀 Próximos Sprints
 
-2. **Implementar endpoint de misiones cercanas**
-   - Editar: `src/controllers/mission.controller.js`
-   - Agregar: `getNearbyMissions(req, res)`
+**Sprint 3: IPFS + RWA Metadata**
+- Setup IPFS client (Infura/Pinata)
+- Upload fotos a IPFS
+- Generar metadata JSON (RWA format)
+- Retornar IPFS URI
 
-3. **Validar fotos con EXIF GPS**
-   - Instalar: `npm install exif-parser`
-   - Crear: `src/utils/photoValidator.js`
-   - Integrar en: `src/controllers/claim.controller.js`
+**Sprint 4: AI Validation**
+- Integración con DETR model
+- Auto-trigger AI en submit claim
+- Store AI result en claims table
 
-4. **Testing**
-   - Crear misión de prueba en Supabase
-   - Simular claim con fotos GPS
-   - Verificar distancia y timestamps
+**Sprint 5: Soul-Bound NFTs + Fee-Sponsored Txs**
+- Modificar CertificateNFT contract
+- Fee sponsorship implementation
+- Auto-mint en hitos
 
-¿Procedo con la implementación de GPS missions + photo validation?
+### 📊 Estado Actual
+- **FASE 0**: 100% completada
+- **FASE 1**: Sprint 1-2 completados (Backend), Sprint 3 próximo
+- **Backend Core Features**: Todos implementados y testeados
+- **Frontend**: Puede iniciar implementación completa - todos los endpoints disponibles

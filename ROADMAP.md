@@ -40,8 +40,8 @@
 6. **Gaming** ✅ - Niveles, XP, rachas, bonos
 
 ### ❌ Gaps vs PRD (Pendientes)
-1. **Misiones GPS** ❌ - Falta geo-discovery con PostGIS
-2. **Fotos Before/After** ❌ - Falta validación dual con EXIF GPS
+1. **Misiones GPS** ✅ - COMPLETADO (PostGIS + API + Testing)
+2. **Fotos Before/After** ✅ - COMPLETADO (EXIF GPS + Perceptual Hash)
 3. **IPFS Metadata** ❌ - Para RWA certificates
 4. **Fee-Sponsored Txs** ❌ - Admin paga gas fees
 5. **Soul-Bound NFTs** ❌ - Minteo de certificados
@@ -83,29 +83,33 @@
 
 **Prioridad**: Alta (Core Feature)
 
-#### Sprint 1: Misiones con GPS (Oct 8-14)
+#### Sprint 1: Misiones con GPS (Oct 8-14) ✅ **COMPLETADO (Backend)**
 **Backend**:
-- [ ] SQL function `missions_nearby()` con PostGIS
-- [ ] API `/api/missions/nearby?lat=X&lon=Y&radius=5000`
-- [ ] Generar códigos de zona (LM-RIM-0412)
-- [ ] Trigger GPS distance validation
+- [x] SQL function `missions_nearby()` con PostGIS
+- [x] API `/api/missions/nearby?lat=X&lon=Y&radius=5000`
+- [x] Generar códigos de zona (LM-RIM-0412)
+- [x] Trigger GPS distance validation
+- [x] Testing completo (459m precision verified)
 
 **Frontend**:
-- [ ] MapLibre GL integration
+- [ ] MapLibre GL integration (PENDIENTE - otro equipo)
 - [ ] Pines personalizados (CSS hoja)
 - [ ] Ficha de misión (popup)
 - [ ] Filtros: Focos/Ríos/Playas/Parques
 
-#### Sprint 2: Fotos Before/After con GPS (Oct 15-21)
+#### Sprint 2: Fotos Before/After con GPS (Oct 15-21) ✅ **COMPLETADO (Backend)**
 **Backend**:
-- [ ] Install `exif-parser` package
-- [ ] Validar coordenadas GPS en EXIF de fotos
-- [ ] Comparar GPS de fotos vs ubicación de misión (max 100m)
-- [ ] Validar timestamp (before < after)
-- [ ] Perceptual hashing (anti-duplicados)
+- [x] Install `exif-parser`, `sharp`, `imghash`, `multer` packages
+- [x] Validar coordenadas GPS en EXIF de fotos
+- [x] Comparar GPS de fotos vs ubicación de misión (configurable radius)
+- [x] Validar timestamp (before < after)
+- [x] Perceptual hashing (anti-duplicados) con imghash
+- [x] 3 nuevos endpoints: `/api/claims/:id/validate-photos`, `/api/claims/:id/upload-before`, `/api/claims/:id/upload-after`
+- [x] Sistema de scoring (0-100 puntos)
+- [x] Multer file upload middleware
 
 **Frontend**:
-- [ ] Pantalla captura foto ANTES
+- [ ] Pantalla captura foto ANTES (PENDIENTE - otro equipo)
 - [ ] GPS verification UI (círculo 20m)
 - [ ] Pantalla captura foto DESPUÉS
 - [ ] Input: bolsas recolectadas
@@ -327,19 +331,13 @@
 
 ---
 
-## 🎯 Próximos 7 Días (Oct 8-14) - **SPRINT ACTUAL**
+## 🎯 Próximos 7 Días (Oct 22-28) - **SPRINT ACTUAL**
 
 ### Backend (Alta Prioridad)
-1. ✅ **Agregar SQL function `missions_nearby()`** con PostGIS
-   - Archivo: `supabase-schema.sql`
-   - Function que retorna misiones dentro de radio X
-2. ✅ **Implementar endpoint GPS missions**
-   - Archivo: `src/controllers/mission.controller.js`
-   - `GET /api/missions/nearby?lat=X&lon=Y&radius=5000`
-3. ✅ **Validación de fotos con EXIF GPS**
-   - Install: `npm install exif-parser`
-   - Crear: `src/utils/photoValidator.js`
-   - Integrar en `src/controllers/claim.controller.js`
+1. ✅ **SQL function `missions_nearby()`** - COMPLETADO
+2. ✅ **Endpoint GPS missions** - COMPLETADO
+3. ✅ **Validación de fotos con EXIF GPS** - COMPLETADO
+4. **Sprint 3: IPFS + RWA Metadata** - PRÓXIMO
 
 ### Frontend (Otro Equipo)
 1. Install Privy React SDK
@@ -354,6 +352,6 @@
 
 ---
 
-**Última Actualización**: 2026-09-24
-**Próxima Revisión**: 2026-10-08
-**Estado**: FASE 0 completada (75%), FASE 1 iniciando
+**Última Actualización**: 2026-09-25
+**Próxima Revisión**: 2026-10-22
+**Estado**: FASE 0 completada (100%), FASE 1 Sprint 1-2 completados (Backend), FASE 1 Sprint 3 próximo
