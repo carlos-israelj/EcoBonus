@@ -1,0 +1,44 @@
+services:
+  - type: web
+    name: ecobonus-backend
+    env: node
+    region: oregon
+    plan: free
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: STELLAR_NETWORK
+        value: testnet
+      - key: STELLAR_HORIZON_URL
+        value: https://horizon-testnet.stellar.org
+      - key: STELLAR_PASSPHRASE
+        value: Test SDF Network ; September 2015
+      - key: MISSION_CONTRACT_ID
+        sync: false
+      - key: REWARD_CONTRACT_ID
+        sync: false
+      - key: CERTIFICATE_NFT_CONTRACT_ID
+        sync: false
+      - key: ADMIN_PUBLIC_KEY
+        sync: false
+      - key: ADMIN_SECRET_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: PRIVY_APP_ID
+        sync: false
+      - key: PRIVY_APP_SECRET
+        sync: false
+      - key: TRUSTLESS_WORK_API_KEY
+        sync: false
+      - key: TRUSTLESS_WORK_API_URL
+        value: https://dev.api.trustlesswork.com
+      - key: CORS_ORIGIN
+        value: "*"
