@@ -5,6 +5,7 @@
 
 import {
   Contract,
+  rpc,
   TransactionBuilder,
   Networks,
   BASE_FEE,
@@ -13,10 +14,6 @@ import {
   nativeToScVal,
   scValToNative,
 } from '@stellar/stellar-sdk'
-
-// Import Soroban namespace - compatible with both v14-15 and v16+
-import * as StellarSDK from '@stellar/stellar-sdk'
-const SorobanRpc = 'SorobanRpc' in StellarSDK ? (StellarSDK as any).SorobanRpc : (StellarSDK as any).Soroban
 
 // Testnet configuration
 const RPC_URL = 'https://soroban-testnet.stellar.org'
@@ -30,7 +27,7 @@ export const CONTRACT_IDS = {
 }
 
 // Initialize Soroban RPC server
-const server = new SorobanRpc.Server(RPC_URL)
+const server = new rpc.Server(RPC_URL)
 
 // Contract instances
 export const contracts = {
@@ -64,7 +61,7 @@ async function buildTransaction(
     throw new Error(`Simulation failed: ${simulated.error}`)
   }
 
-  const prepared = SorobanRpc.assembleTransaction(transaction, simulated)
+  const prepared = rpc.assembleTransaction(transaction, simulated)
   return prepared.build()
 }
 
@@ -72,7 +69,7 @@ async function buildTransaction(
  * Submit a signed transaction to the network
  */
 async function submitTransaction(signedXDR: string) {
-  const transaction = TransactionBuilder.fromXDR(signedXDR, NETWORK_PASSPHRASE)
+  const transaction = TransactionBuilder.fromXdr(signedXDR, NETWORK_PASSPHRASE)
 
   const response = await server.sendTransaction(transaction)
 
@@ -127,7 +124,7 @@ export async function submitClaim(
     ...params
   )
 
-  const signedXDR = await signTransaction(tx.toXDR())
+  const signedXDR = await signTransaction(tx.toXdr())
   const result = await submitTransaction(signedXDR)
 
   return {
@@ -215,7 +212,7 @@ export async function mintCertificate(
     ...params
   )
 
-  const signedXDR = await signTransaction(tx.toXDR())
+  const signedXDR = await signTransaction(tx.toXdr())
   const result = await submitTransaction(signedXDR)
 
   return {
@@ -242,7 +239,7 @@ export async function getCertificate(tokenId: number) {
 
   const simulated = await server.simulateTransaction(transaction)
 
-  if (SorobanRpc.Api.isSimulationSuccess(simulated) && simulated.result) {
+  if (rpc.Api.isSimulationSuccess(simulated) && simulated.result) {
     return scValToNative(simulated.result.retval)
   }
 
