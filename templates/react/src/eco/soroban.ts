@@ -5,7 +5,6 @@
 
 import {
   Contract,
-  rpc,
   TransactionBuilder,
   Networks,
   BASE_FEE,
@@ -14,6 +13,10 @@ import {
   nativeToScVal,
   scValToNative,
 } from '@stellar/stellar-sdk'
+import * as StellarSDK from '@stellar/stellar-sdk'
+
+// Access rpc namespace from the SDK
+const { rpc } = StellarSDK
 
 // Testnet configuration
 const RPC_URL = 'https://soroban-testnet.stellar.org'
