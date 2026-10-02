@@ -29,4 +29,11 @@ pub enum Error {
     // Token errors
     TokenTransferFailed = 40,
     InvalidTokenAddress = 41,
+
+    // Initialization errors
+    AlreadyInitialized = 50,
+    NotInitialized = 51,
+
+    // Distribution errors
+    AlreadyDistributed = 60,
 }

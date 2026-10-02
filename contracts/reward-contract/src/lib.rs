@@ -7,7 +7,7 @@ mod error;
 #[cfg(test)]
 mod test;
 
-use soroban_sdk::{contract, contractimpl, Address, Env, String, Vec};
+use soroban_sdk::{contract, contractimpl, token, Address, Env, String, Vec};
 use types::{RewardPool, Claim, ClaimStatus};
 use error::Error;
 
@@ -16,12 +16,22 @@ pub struct RewardContract;
 
 #[contractimpl]
 impl RewardContract {
-    /// Initialize the contract
-    pub fn initialize(env: Env, admin: Address) {
+    /// Initialize the contract (can only be called once)
+    pub fn initialize(env: Env, admin: Address, xlm_token: Address) -> Result<(), Error> {
+        // Check if already initialized
+        if storage::is_initialized(&env) {
+            return Err(Error::AlreadyInitialized);
+        }
+
         storage::set_admin(&env, &admin);
+        storage::set_xlm_token(&env, &xlm_token);
+        storage::set_initialized(&env);
+
+        Ok(())
     }
 
     /// Create a new reward pool with native XLM
+    /// Transfers XLM from sponsor to contract
     pub fn create_pool(
         env: Env,
         sponsor: Address,
@@ -35,9 +45,14 @@ impl RewardContract {
         }
 
         // Validate amount
-        if initial_amount < 0 {
+        if initial_amount <= 0 {
             return Err(Error::InvalidAmount);
         }
+
+        // Transfer XLM from sponsor to contract
+        let xlm_token = storage::get_xlm_token(&env);
+        let token_client = token::TokenClient::new(&env, &xlm_token);
+        token_client.transfer(&sponsor, &env.current_contract_address(), &initial_amount);
 
         // Create pool
         let pool = RewardPool {
@@ -54,6 +69,7 @@ impl RewardContract {
     }
 
     /// Fund an existing pool with XLM
+    /// Transfers additional XLM from sponsor to contract
     pub fn fund_pool(
         env: Env,
         sponsor: Address,
@@ -71,6 +87,11 @@ impl RewardContract {
             return Err(Error::PoolInactive);
         }
 
+        // Transfer XLM from sponsor to contract
+        let xlm_token = storage::get_xlm_token(&env);
+        let token_client = token::TokenClient::new(&env, &xlm_token);
+        token_client.transfer(&sponsor, &env.current_contract_address(), &amount);
+
         // Update pool accounting
         pool.total_funded += amount;
         pool.available_balance += amount;
@@ -80,6 +101,7 @@ impl RewardContract {
     }
 
     /// Withdraw XLM from pool (sponsor only)
+    /// Transfers XLM from contract back to sponsor
     pub fn withdraw_pool(
         env: Env,
         sponsor: Address,
@@ -96,6 +118,11 @@ impl RewardContract {
         if amount > pool.available_balance {
             return Err(Error::InsufficientPoolBalance);
         }
+
+        // Transfer XLM from contract to sponsor
+        let xlm_token = storage::get_xlm_token(&env);
+        let token_client = token::TokenClient::new(&env, &xlm_token);
+        token_client.transfer(&env.current_contract_address(), &sponsor, &amount);
 
         // Update pool accounting
         pool.available_balance -= amount;
@@ -207,21 +234,24 @@ impl RewardContract {
     }
 
     /// Distribute XLM reward after validation (automatic after approval)
+    /// Transfers XLM from contract to claimer
     pub fn distribute_reward(
         env: Env,
         claim_id: u64,
     ) -> Result<(), Error> {
-        let claim = storage::get_claim(&env, claim_id)?;
+        let mut claim = storage::get_claim(&env, claim_id)?;
 
         // Can only distribute approved claims
         if claim.status != ClaimStatus::Approved {
             return Err(Error::ClaimNotPending);
         }
 
-        // Find the pool (iterate through sponsor claims)
-        // In production, we'd store sponsor reference in claim
-        // For now, we'll search (not optimal but works for MVP)
-        let sponsor = Self::find_claim_sponsor(&env, claim_id)?;
+        // Prevent double distribution
+        if claim.status == ClaimStatus::Distributed {
+            return Err(Error::AlreadyDistributed);
+        }
+
+        let sponsor = claim.sponsor.clone();
         let mut pool = storage::get_pool(&env, &sponsor)?;
 
         // Check balance
@@ -229,10 +259,19 @@ impl RewardContract {
             return Err(Error::InsufficientPoolBalance);
         }
 
+        // Transfer XLM from contract to claimer
+        let xlm_token = storage::get_xlm_token(&env);
+        let token_client = token::TokenClient::new(&env, &xlm_token);
+        token_client.transfer(&env.current_contract_address(), &claim.claimer, &claim.amount);
+
         // Update pool accounting
         pool.available_balance -= claim.amount;
         pool.total_distributed += claim.amount;
         storage::set_pool(&env, &sponsor, &pool);
+
+        // Mark claim as distributed
+        claim.status = ClaimStatus::Distributed;
+        storage::set_claim(&env, claim_id, &claim);
 
         Ok(())
     }

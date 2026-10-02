@@ -16,7 +16,8 @@ pub struct RewardPool {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum ClaimStatus {
     Pending,      // Waiting for validation
-    Approved,     // Validated and paid
+    Approved,     // Validated but not yet paid
+    Distributed,  // Approved and XLM transferred to claimer
     Rejected,     // Rejected by validator
     Disputed,     // In manual review
 }

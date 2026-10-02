@@ -10,6 +10,8 @@ const CLAIM_PREFIX: &str = "claim";
 const SPONSOR_CLAIMS_PREFIX: &str = "sponsor_claims";
 const USER_CLAIMS_PREFIX: &str = "user_claims";
 const VALIDATORS_KEY: &str = "validators";
+const XLM_TOKEN_KEY: &str = "xlm_token";
+const INITIALIZED_KEY: &str = "initialized";
 
 /// Get admin address
 pub fn get_admin(env: &Env) -> Address {
@@ -24,6 +26,35 @@ pub fn set_admin(env: &Env, admin: &Address) {
     env.storage()
         .instance()
         .set(&symbol_short!("admin"), admin);
+}
+
+/// Get XLM token address
+pub fn get_xlm_token(env: &Env) -> Address {
+    env.storage()
+        .instance()
+        .get(&symbol_short!("xlm_tok"))
+        .unwrap()
+}
+
+/// Set XLM token address
+pub fn set_xlm_token(env: &Env, token: &Address) {
+    env.storage()
+        .instance()
+        .set(&symbol_short!("xlm_tok"), token);
+}
+
+/// Check if contract is initialized
+pub fn is_initialized(env: &Env) -> bool {
+    env.storage()
+        .instance()
+        .has(&symbol_short!("init"))
+}
+
+/// Mark contract as initialized
+pub fn set_initialized(env: &Env) {
+    env.storage()
+        .instance()
+        .set(&symbol_short!("init"), &true);
 }
 
 /// Get next claim ID
