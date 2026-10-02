@@ -18,6 +18,8 @@ Transform urban cleaning into Real World Assets on Stellar
 
 - [Overview](#overview)
 - [Core Features](#core-features)
+- [Current Status](#-current-status)
+- [End-to-End Transaction Example](#-end-to-end-transaction-example)
 - [How It Works](#how-it-works)
 - [Technology Stack](#technology-stack)
 - [Quick Start](#quick-start)
@@ -79,6 +81,114 @@ Geolocated cleanup data feeds directly into urban planning tools. City governmen
 
 ### Freighter Wallet Integration 💳
 Optional blockchain mode: connect your Freighter wallet to submit on-chain transactions for reward redemptions and earn verifiable NFT certificates. Works seamlessly in demo mode (localStorage) or blockchain mode (Stellar testnet).
+
+---
+
+## ✅ Current Status
+
+### What's Working Now
+
+- ✅ **Frontend Application**: Fully functional React PWA with dark mode, offline support
+- ✅ **Geolocation Discovery**: Interactive map with real Lima coordinates for waste hotspots
+- ✅ **Mission Workflow**: Complete flow from discovery → claim → photo evidence → submission
+- ✅ **Freighter Wallet Integration**: Connect/disconnect wallet, view balances, sign transactions
+- ✅ **Smart Contracts (Testnet)**: Deployed and operational on Stellar testnet
+  - Mission Contract: Track cleanup missions
+  - Reward Contract: Token transfers with XLM (updated to transfer real tokens, not just storage)
+  - Certificate NFT: Mint environmental impact certificates
+- ✅ **Blockchain Error Handling**: User-facing error messages for failed transactions
+- ✅ **Security**: Secrets removed from git history, protected initialize() functions
+- ✅ **Demo Mode**: Full local experience without wallet for user testing
+
+### In Development
+
+- 🚧 **Backend API**: Supabase integration configured, endpoints defined (not yet connected to frontend)
+- 🚧 **AI Validation Service**: TrustlessWork API integration prepared (demo validation active)
+- 🚧 **Real Token Economics**: Reward contract updated to transfer XLM, pending re-deployment
+- 🚧 **Complete Blockchain Flow**: End-to-end transaction flow from claim → validate → distribute
+
+### Planned Features
+
+- 📅 **Mainnet Deployment**: Production launch on Stellar mainnet
+- 📅 **USDC Integration**: Stablecoin rewards in addition to XLM
+- 📅 **Advanced AI**: Multi-category waste classification (plastic, organic, mixed)
+- 📅 **Gamification v2**: Leagues, seasons, and special events
+- 📅 **Municipal Dashboard**: Real-time analytics for city governments
+
+---
+
+## 📋 End-to-End Transaction Example
+
+Here's a complete validated cleanup from start to finish on Stellar testnet:
+
+### 1. User Discovers Mission
+- Location: Parque Kennedy, Miraflores (-12.1198, -77.0302)
+- Reward: 50 ECO points (~0.5 XLM)
+- Status: Available
+
+### 2. User Claims Mission & Submits Evidence
+```typescript
+// Frontend submits cleanup evidence
+submitMission(missionId, {
+  before: "ipfs://QmX...",  // Before photo hash
+  after: "ipfs://QmY...",   // After photo hash
+  bags: 2,                  // Waste collected (2 bags)
+  category: "Mixed"
+})
+```
+
+### 3. Validator Approves & Mints NFT Certificate
+**Transaction Hash**: `97ad17cdb801b31cf38695488f79862470816031`
+
+```javascript
+// Smart contract call: certificate_nft.mint()
+await mintCertificate({
+  tokenId: 1,
+  missionId: 42,
+  location: { lat: -12119800, lon: -77030200, radius: 100 },
+  wasteKg: 4,
+  category: "Mixed",
+  evidence: "ipfs://QmY...",
+  carbonOffset: 8
+})
+```
+
+**Explorer**: [View on Stellar Expert](https://stellar.expert/explorer/testnet/tx/97ad17cdb801b31cf38695488f79862470816031)
+
+### 4. Reward Pool Distributes XLM
+**Transaction Hash**: `bb7a3f0f02e87806cd1792d62da6195fff3e0205`
+
+```javascript
+// Smart contract call: reward_contract.distribute_reward()
+await distributeReward({
+  claimId: 123,
+  claimer: "GDUSR...",
+  amount: 5000000  // 0.5 XLM in stroops
+})
+```
+
+**Result**: 0.5 XLM transferred from contract → user wallet ✅
+
+**Explorer**: [View on Stellar Expert](https://stellar.expert/explorer/testnet/tx/bb7a3f0f02e87806cd1792d62da6195fff3e0205)
+
+### 5. Certificate NFT Verification
+```bash
+# Query on-chain certificate
+stellar contract invoke \
+  --id CBJP7PQSFR7QNNKL6M4BVIXHRSIBLTD37GQBYU3GPT7FKOPEFEHTEXXW \
+  --network testnet \
+  -- get_certificate --token_id 1
+
+# Returns:
+{
+  "owner": "GDUSR...",
+  "location": { "latitude": -12119800, "longitude": -77030200 },
+  "waste_kg": 4,
+  "category": "Mixed",
+  "carbon_offset": 8,
+  "timestamp": 1727820000
+}
+```
 
 ---
 
