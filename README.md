@@ -393,10 +393,24 @@ pub fn get_active_missions_near(env: Env, location: Location, radius_meters: u32
 
 **Key Functions**:
 ```rust
-pub fn create_pool(env: Env, sponsor: Address, token: Address, initial_amount: i128) -> u64
-pub fn submit_claim(env: Env, user: Address, mission_id: u64, amount: i128, proof_uri: String) -> u64
-pub fn validate_claim(env: Env, validator: Address, claim_id: u64, approved: bool) -> Result<(), Error>
+// Initialize contract (one-time only, protected)
+pub fn initialize(env: Env, admin: Address, xlm_token: Address) -> Result<(), Error>
+
+// Pool management with REAL XLM transfers
+pub fn create_pool(env: Env, sponsor: Address, initial_amount: i128) -> Result<(), Error>
+pub fn fund_pool(env: Env, sponsor: Address, amount: i128) -> Result<(), Error>
+pub fn withdraw_pool(env: Env, sponsor: Address, amount: i128) -> Result<(), Error>
+
+// Claim workflow
+pub fn submit_claim(env: Env, mission_id: u64, claimer: Address, amount: i128, proof_uri: String, sponsor: Address) -> Result<u64, Error>
+pub fn validate_claim(env: Env, claim_id: u64, validator: Address, approved: bool) -> Result<(), Error>
+
+// Distribution with actual XLM transfer to claimer
 pub fn distribute_reward(env: Env, claim_id: u64) -> Result<(), Error>
+
+// Query functions
+pub fn get_pool(env: Env, sponsor: Address) -> Result<RewardPool, Error>
+pub fn get_claim(env: Env, claim_id: u64) -> Result<Claim, Error>
 ```
 
 **Certificate NFT Contract** (`certificate_nft.rs`):
@@ -771,10 +785,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-## Team
+## Team & Contributors
 
-**Lead Developer**: Carlos Israel Jiménez
-**GitHub**: [@carlos-israelj](https://github.com/carlos-israelj)
+**Core Team**:
+- **Luisa Candelaria Vera Quispe** ([@candeluisa](https://github.com/candeluisa)) - Product Manager & UX Design
+- **Israel Jiménez** ([@carlos-israelj](https://github.com/carlos-israelj)) - Backend & Smart Contracts
+- **Jorge Abril** ([@jorgeabrilpino-hash](https://github.com/jorgeabrilpino-hash)) - Frontend & Full-stack Development
+
+Special thanks to all contributors who have helped improve EcoBonus!
 
 ---
 
