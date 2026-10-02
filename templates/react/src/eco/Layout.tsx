@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Bell, ChevronDown, Compass, Download, Gift, HelpCircle, LayoutDashboard, Leaf, MapPin, Menu, ShieldCheck, Sparkles, Trophy, UserRound, X, Flag, Settings, WifiOff, ArrowUpRight, Building2 } from 'lucide-react'
+import { Bell, ChevronDown, Compass, Download, Gift, HelpCircle, LayoutDashboard, Leaf, MapPin, Menu, ShieldCheck, Sparkles, Trophy, UserRound, X, Flag, Settings, WifiOff, ArrowUpRight, Building2, AlertCircle } from 'lucide-react'
 import { Link, NavLink, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useEco } from './store'
 import { Logo, Modal, Points, Progress } from './ui'
@@ -14,7 +14,7 @@ const links = [
   { to: '/perfil', label: 'Mi perfil', icon: UserRound },
 ]
 export default function Layout() {
-  const { profile, points, xp, theme, missions, joined } = useEco()
+  const { profile, points, xp, theme, missions, joined, lastBlockchainError, clearBlockchainError } = useEco()
   const [menu, setMenu] = useState(false), [notices, setNotices] = useState(false), [install, setInstall] = useState(false)
   const [online, setOnline] = useState(navigator.onLine), [prompt, setPrompt] = useState<InstallPrompt | null>(null)
   const location = useLocation()
@@ -47,6 +47,7 @@ export default function Layout() {
     <div className="workspace">
       <header className="topbar"><div className="topbar-left"><button className="icon-button mobile-only" aria-label="Abrir menú" onClick={() => setMenu(true)}><Menu size={23} /></button><div className="desktop-only breadcrumb">EcoBonus <span>/</span> {links.find(l => l.to === location.pathname)?.label ?? 'Tu impacto'}</div><div className="mobile-brand"><Logo /></div></div><div className="topbar-actions"><WalletConnect /><span className="demo-pill"><span /> Demo interactiva</span><Link className="balance-pill" to="/recompensas"><Points value={points} /></Link><button className="icon-button notification-button" aria-label="Ver notificaciones" onClick={() => setNotices(true)}><Bell size={20} /><i /></button><Link to={joined ? '/perfil' : '/bienvenida'} className="user-pill"><span className="avatar">{profile.name.slice(0, 1).toUpperCase()}</span><span className="desktop-only">{profile.name}<ChevronDown size={13} /></span></Link></div></header>
       {!online && <div className="offline-banner" role="status"><WifiOff size={16} /> Estás sin conexión. Tu progreso local sigue disponible; el mapa necesita internet.</div>}
+      {lastBlockchainError && <div className="offline-banner blockchain-error-banner" role="alert"><AlertCircle size={16} /> {lastBlockchainError} <button onClick={clearBlockchainError} style={{marginLeft: 'auto', background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', padding: '4px'}}><X size={16} /></button></div>}
       <main id="main" tabIndex={-1}><Outlet /></main>
       <footer className="page-footer"><span><Leaf size={13} /> Cada pequeña acción cuenta.</span><span>Lima, Perú <span className="tiny-dot">·</span> Hecho para un futuro más verde</span></footer>
     </div>

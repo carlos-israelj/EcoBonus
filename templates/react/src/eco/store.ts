@@ -9,10 +9,12 @@ interface State {
   missions: Mission[]; rewards: Reward[]; vouchers: Voucher[]; reports: Report[];
   budget: number; theme: 'light' | 'dark' | 'system';
   walletAddress: string | null; blockchainEnabled: boolean;
+  lastBlockchainError: string | null;
   updateProfile: (profile: Profile) => void;
   setTheme: (theme: State['theme']) => void;
   setWalletAddress: (address: string | null) => void;
   setBlockchainEnabled: (enabled: boolean) => void;
+  clearBlockchainError: () => void;
   startMission: (spotId: string) => string;
   updateEvidence: (id: string, kind: 'before' | 'after', evidence: Evidence) => void;
   setBags: (id: string, bags: number) => void;
@@ -36,6 +38,7 @@ const initial = () => ({
   theme: 'light' as State['theme'],
   walletAddress: null,
   blockchainEnabled: false,
+  lastBlockchainError: null,
 })
 const storage = {
   getItem: (name: string) => localStorage.getItem(name),
@@ -51,6 +54,7 @@ export const useEco = create<State>()(persist((set, get) => ({
   setTheme: theme => set({ theme }),
   setWalletAddress: address => set({ walletAddress: address }),
   setBlockchainEnabled: enabled => set({ blockchainEnabled: enabled }),
+  clearBlockchainError: () => set({ lastBlockchainError: null }),
   startMission: spotId => {
     const state = get()
     const existing = state.missions.find(m => m.status === 'active' || (m.spotId === spotId && m.status === 'pending'))
@@ -99,8 +103,10 @@ export const useEco = create<State>()(persist((set, get) => ({
           console.log(`✅ NFT Certificate minted on-chain: Token #${tokenId}, TX: ${txHash}`)
         }
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Error desconocido al mintear certificado NFT'
         console.error('Failed to mint certificate on-chain:', error)
-        // Continue with local approval even if blockchain fails
+        set({ lastBlockchainError: `Error blockchain: ${errorMessage}` })
+        throw new Error(`No se pudo mintear el certificado NFT en blockchain: ${errorMessage}`)
       }
     }
 
@@ -134,8 +140,10 @@ export const useEco = create<State>()(persist((set, get) => ({
         )
         console.log(`✅ Claim submitted on-chain: Claim #${claimId}, TX: ${txHash}`)
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : 'Error desconocido al enviar reclamo'
         console.error('Failed to submit claim on-chain:', error)
-        // Continue with local redemption even if blockchain fails
+        set({ lastBlockchainError: `Error blockchain: ${errorMessage}` })
+        throw new Error(`No se pudo enviar el reclamo a blockchain: ${errorMessage}`)
       }
     }
 
